@@ -1,0 +1,11 @@
+android {
+    namespace 'com.emobies.app'
+    compileSdk 35
+    targetSdk 35
+    defaultConfig {
+        minSdk 26
+    }
+    buildFeatures {
+        buildConfig true
+    }
+}
