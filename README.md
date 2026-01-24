@@ -8,3 +8,5 @@ Emobies mobile repair app API 35 upgrade. Visibility Public. Add README On. Add 
 ⭐ oh-my-posh sponsor (Microsoft MVP network)
 Emobies API v1.0.3 - DO live ✅"
 Commit "Trigger DO deploy" → Push
+emowall-ai-pwa
+→ Update release
