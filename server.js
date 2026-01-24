@@ -1,4 +1,3 @@
-app.listen(process.env.PORT || 8080, ()=>console.log('Emobies live on', process.env.PORT)
 const express = require('express');
 const cors = require('cors');
 const app = express();
