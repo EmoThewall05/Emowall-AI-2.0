@@ -1,0 +1,8 @@
+Attach emowall-ai-pwa → Publish
+
+2. Copy release URL: github.com/.../releases/tag/v1.0.0
+
+3. Play Console → Production → New release
+   → Source code: paste GitHub URL
+   → Upload APK: emowall-ai-pwa (download from release)
+   → Save → Review → Confirm
