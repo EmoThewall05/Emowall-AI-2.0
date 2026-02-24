@@ -15,12 +15,17 @@ jobs:
     - uses: subosito/flutter-action@v2
       with:
         flutter-version: '3.27.1'
-    - name: Build Specialist APK
+    - name: Build APK
+      env:
+        STORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+        KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+        KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
       run: |
         flutter pub get
-        echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/emobies.keystore
-        flutter build apk --release --target-platform android-arm64 --key-store-password="${{ secrets.KEYSTORE_PASSWORD }}" --key-password="${{ secrets.KEY_PASSWORD }}" --keystore=android/app/emobies.keystore --alias="${{ secrets.KEY_ALIAS }}" --dart-define=API_BASE="${{ secrets.API_BASE_URL }}"
-    - name: Upload
+        echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/emowall.keystore
+        # സ്പെഷ്യലിസ്റ്റ് ബിൽഡ് കമാൻഡ് (Invalid flags നീക്കം ചെയ്തു)
+        flutter build apk --release --target-platform android-arm64 --dart-define=API_BASE="${{ secrets.API_BASE_URL }}"
+    - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
         name: Emowall-Pro-APK
