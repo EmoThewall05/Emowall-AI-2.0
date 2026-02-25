@@ -15,6 +15,9 @@ dependencies:
   http: ^1.2.1
   connectivity_plus: ^6.0.3           # ഇന്റർനെറ്റ് ചെക്ക് ചെയ്യാൻ
   flutter_local_notifications: ^17.2.2 # സൗണ്ട് നോട്ടിഫിക്കേഷന് വേണ്ടി
+  sensors_plus: ^5.0.0                # Baby Mode sensors
+  audioplayers: ^6.0.0                # Baby Mode sounds
+  url_launcher: ^6.0.0                # Kids playlist / links
 
 dev_dependencies:
   flutter_test:
@@ -24,19 +27,7 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   # സൗണ്ട് ഫയൽ ചേർക്കാൻ താഴെ പറയുന്ന ഭാഗം കൂടി ഉപയോഗിക്കാം
-  # assets:
-  #   - assets/sounds/ai_alert.mp3
-  dependencies:
-  flutter:
-    sdk: flutter
-  http: ^1.2.1
-  sensors_plus: ^5.0.0
-  audioplayers: ^6.0.0
-  url_launcher: ^6.0.0
-  # proximity sensor plugin: check later (platform-specific)
-  flutter:
-  uses-material-design: true
   assets:
+    - assets/sounds/ai_alert.mp3
     - assets/sounds/baby_cry.mp3
     - assets/sounds/baby_song.mp3
-
