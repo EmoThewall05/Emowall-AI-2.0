@@ -17,12 +17,17 @@ class EmowallApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData.dark().copyWith(
         scaffoldBackgroundColor: const Color(0xFF07080B),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0xFF0D1117),
+          elevation: 0,
+        ),
       ),
       home: const SplashScreen(),
     );
   }
 }
 
+// ─── Splash Screen ────────────────────────────────────
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -44,85 +49,182 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: Color(0xFF07080B),
+    return Scaffold(
+      backgroundColor: const Color(0xFF07080B),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children:,
-        ),
-      ),
-    );
-  }
-}
-
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Emowall AI Dashboard'),
-        backgroundColor: const Color(0xFF0D1117),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
           children: [
-            _buildMenuCard(
-              context,
-              'Digital Amma',
-              'Baby Care & Lullaby',
-              Icons.child_care,
-              Colors.pinkAccent,
-              const DigitalAmmaScreen(),
+            // TODO: Replace with your ButterflyLogo if you want
+            const Icon(Icons.auto_awesome, size: 70, color: Color(0xFF00E5FF)),
+            const SizedBox(height: 24),
+            const Text(
+              'Emowall AI',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 2,
+              ),
             ),
-            const SizedBox(height: 15),
-            _buildMenuCard(
-              context,
-              'Child Doctor AI',
-              'Pediatric Support',
-              Icons.medical_services,
-              Colors.blueAccent,
-              const ChildDoctorAI(),
-            ),
-            const SizedBox(height: 15),
-            _buildMenuCard(
-              context,
-              'Guardian AI',
-              'Elderly & Emergency Care',
-              Icons.security,
-              Colors.greenAccent,
-              const GuardianAIScreen(),
+            const SizedBox(height: 8),
+            Text(
+              'version 2.0',
+              style: TextStyle(
+                color: Colors.white.withOpacity(0.4),
+                fontSize: 13,
+                letterSpacing: 1,
+              ),
             ),
           ],
         ),
       ),
     );
   }
+}
 
-  Widget _buildMenuCard(
-    BuildContext context,
-    String title,
-    String sub,
-    IconData icon,
-    Color color,
-    Widget screen,
-  ) {
-    return Card(
-      color: const Color(0xFF161B22),
-      child: ListTile(
-        leading: Icon(icon, color: color, size: 40),
-        title: Text(
-          title,
-          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+// ─── Home Screen / Dashboard ──────────────────────────
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF07080B),
+      appBar: AppBar(
+        title: const Text(
+          'Emowall AI Dashboard',
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        subtitle: Text(sub, style: const TextStyle(color: Colors.white60)),
-        trailing: const Icon(Icons.arrow_forward_ios, color: Colors.white24, size: 18),
-        onTap: () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => screen),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(20),
+        children: [
+          _header(),
+          const SizedBox(height: 20),
+          _buildMenuCard(
+            context,
+            title: 'Digital Amma',
+            subtitle: 'Baby Care • Lullaby • Autism Support',
+            icon: Icons.child_care,
+            gradient: const [Color(0xFFFF6B81), Color(0xFFFF9A9E)],
+            screen: const DigitalAmmaScreen(),
+          ),
+          _buildMenuCard(
+            context,
+            title: 'Child Doctor AI',
+            subtitle: 'Emotional Support • Therapy • Stories',
+            icon: Icons.medical_services,
+            gradient: const [Color(0xFF00E5FF), Color(0xFF7C3AED)],
+            screen: const ChildDoctorAI(),
+          ),
+          _buildMenuCard(
+            context,
+            title: 'Guardian AI',
+            subtitle: 'Elder Care • Medicine • Emergency',
+            icon: Icons.security,
+            gradient: const [Color(0xFF00FF88), Color(0xFF00E5FF)],
+            screen: const GuardianAIScreen(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _header() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: const [
+        Text(
+          'Welcome to Emowall AI 2.0',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        SizedBox(height: 6),
+        Text(
+          'World’s first life‑care AI ecosystem — from baby to elderly.',
+          style: TextStyle(
+            color: Colors.white70,
+            fontSize: 13,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMenuCard({
+    required BuildContext context,
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required List<Color> gradient,
+    required Widget screen,
+  }) {
+    return GestureDetector(
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => screen),
+      ),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 16),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(colors: gradient),
+          borderRadius: BorderRadius.circular(18),
+          boxShadow: [
+            BoxShadow(
+              color: gradient.last.withOpacity(0.4),
+              blurRadius: 18,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: const Color(0xFF161B22).withOpacity(0.9),
+            borderRadius: BorderRadius.circular(18),
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: LinearGradient(colors: gradient),
+                ),
+                child: Icon(icon, color: Colors.white, size: 28),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      subtitle,
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(Icons.arrow_forward_ios,
+                  color: Colors.white38, size: 18),
+            ],
+          ),
         ),
       ),
     );
