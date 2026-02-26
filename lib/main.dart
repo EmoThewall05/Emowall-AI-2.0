@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+
+// Screens
 import 'baby/digital_amma.dart';
 import 'child/child_doctor_ai.dart';
 import 'care/guardian_ai.dart';
+import 'health/womens_health_ai_screen.dart';
 
 void main() {
   runApp(const EmowallApp());
@@ -27,7 +30,9 @@ class EmowallApp extends StatelessWidget {
   }
 }
 
-// ─── Splash Screen ────────────────────────────────────
+// ─────────────────────────────────────────────
+// Splash Screen
+// ─────────────────────────────────────────────
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -55,7 +60,6 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // TODO: Replace with your ButterflyLogo if you want
             const Icon(Icons.auto_awesome, size: 70, color: Color(0xFF00E5FF)),
             const SizedBox(height: 24),
             const Text(
@@ -83,7 +87,9 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 }
 
-// ─── Home Screen / Dashboard ──────────────────────────
+// ─────────────────────────────────────────────
+// Home Screen / Dashboard
+// ─────────────────────────────────────────────
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
@@ -102,6 +108,8 @@ class HomeScreen extends StatelessWidget {
         children: [
           _header(),
           const SizedBox(height: 20),
+
+          // Digital Amma
           _buildMenuCard(
             context,
             title: 'Digital Amma',
@@ -110,6 +118,8 @@ class HomeScreen extends StatelessWidget {
             gradient: const [Color(0xFFFF6B81), Color(0xFFFF9A9E)],
             screen: const DigitalAmmaScreen(),
           ),
+
+          // Child Doctor AI
           _buildMenuCard(
             context,
             title: 'Child Doctor AI',
@@ -118,6 +128,8 @@ class HomeScreen extends StatelessWidget {
             gradient: const [Color(0xFF00E5FF), Color(0xFF7C3AED)],
             screen: const ChildDoctorAI(),
           ),
+
+          // Guardian AI
           _buildMenuCard(
             context,
             title: 'Guardian AI',
@@ -125,6 +137,16 @@ class HomeScreen extends StatelessWidget {
             icon: Icons.security,
             gradient: const [Color(0xFF00FF88), Color(0xFF00E5FF)],
             screen: const GuardianAIScreen(),
+          ),
+
+          // ⭐ NEW — Women’s Health AI
+          _buildMenuCard(
+            context,
+            title: 'Women\'s Health AI',
+            subtitle: 'Breast • Thyroid • Varicose • Diet Awareness',
+            icon: Icons.female,
+            gradient: const [Color(0xFFFF4F9A), Color(0xFFFF9A9E)],
+            screen: const WomensHealthAIScreen(),
           ),
         ],
       ),
