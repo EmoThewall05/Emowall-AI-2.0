@@ -1,0 +1,30 @@
+# Fix folder structure
+mv lib/widgets/lib/baby lib/baby
+mv lib/widgets/lib/care lib/care  
+mv lib/widgets/lib/child lib/child
+
+# Remove node_modules from git tracking
+git rm -r --cached node_modules/
+echo "node_modules/" >> .gitignore
+
+# Push fixes
+git add .
+git commit -m "Fix: Correct folder structure"
+git push origin Emowall-Ai-2.0
+```
+
+---
+
+**After fix — correct structure:**
+```
+lib/
+├── main.dart
+├── baby/
+│   └── digital_amma.dart
+├── care/
+│   └── guardian_ai.dart
+├── child/
+│   └── child_doctor_ai.dart
+└── widgets/
+    └── butterfly_logo.dart
+    
