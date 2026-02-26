@@ -70,26 +70,60 @@ class HomeScreen extends StatelessWidget {
         padding: const EdgeInsets.all(20.0),
         child: Column(
           children: [
-            _buildMenuCard(context, 'Digital Amma', 'Baby Care & Lullaby', Icons.child_care, Colors.pinkAccent, const DigitalAmmaScreen()),
+            _buildMenuCard(
+              context,
+              'Digital Amma',
+              'Baby Care & Lullaby',
+              Icons.child_care,
+              Colors.pinkAccent,
+              const DigitalAmmaScreen(),
+            ),
             const SizedBox(height: 15),
-            _buildMenuCard(context, 'Child Doctor AI', 'Pediatric Support', Icons.medical_services, Colors.blueAccent, const ChildDoctorAI()),
+            _buildMenuCard(
+              context,
+              'Child Doctor AI',
+              'Pediatric Support',
+              Icons.medical_services,
+              Colors.blueAccent,
+              const ChildDoctorAI(),
+            ),
             const SizedBox(height: 15),
-            _buildMenuCard(context, 'Guardian AI', 'Elderly & Emergency Care', Icons.security, Colors.greenAccent, const GuardianAIScreen()),
+            _buildMenuCard(
+              context,
+              'Guardian AI',
+              'Elderly & Emergency Care',
+              Icons.security,
+              Colors.greenAccent,
+              const GuardianAIScreen(),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildMenuCard(BuildContext context, String title, String sub, IconData icon, Color color, Widget screen) {
+  Widget _buildMenuCard(
+    BuildContext context,
+    String title,
+    String sub,
+    IconData icon,
+    Color color,
+    Widget screen,
+  ) {
     return Card(
       color: const Color(0xFF161B22),
       child: ListTile(
         leading: Icon(icon, color: color, size: 40),
-        title: Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        title: Text(
+          title,
+          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
         subtitle: Text(sub, style: const TextStyle(color: Colors.white60)),
         trailing: const Icon(Icons.arrow_forward_ios, color: Colors.white24, size: 18),
-        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => screen)),
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => screen),
+        ),
       ),
     );
   }
