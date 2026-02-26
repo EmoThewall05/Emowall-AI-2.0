@@ -27,4 +27,5 @@ lib/
 │   └── child_doctor_ai.dart
 └── widgets/
     └── butterfly_logo.dart
+    flutter create . --platforms=android --org com.emobies
     
