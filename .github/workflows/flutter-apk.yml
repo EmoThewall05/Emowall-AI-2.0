@@ -24,9 +24,13 @@ jobs:
       - name: Fix MainActivity
         run: |
           mkdir -p android/app/src/main/kotlin/com/emobies/emowall/
-          echo 'package com.emobies.emowall
-import io.flutter.embedding.android.FlutterFragmentActivity
-class MainActivity: FlutterFragmentActivity()' > android/app/src/main/kotlin/com/emobies/emowall/MainActivity.kt
+          cat > android/app/src/main/kotlin/com/emobies/emowall/MainActivity.kt << EOF
+          package com.emobies.emowall
+
+          import io.flutter.embedding.android.FlutterFragmentActivity
+
+          class MainActivity: FlutterFragmentActivity()
+          EOF
 
       - name: Flutter pub get
         run: flutter pub get
