@@ -1,9 +1,10 @@
-name: Flutter Build APK
+name: Emowall Pro Build
 
 on:
   push:
     branches:
       - Emowall-Ai-2.0
+  workflow_dispatch:
 
 jobs:
   build:
@@ -20,20 +21,56 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.41.2'
+          cache: true
 
-      - name: Fix MainActivity
+      - name: Specialist Cleanup & Reset
         run: |
-          mkdir -p android/app/src/main/kotlin/com/emobies/emowall/
-          cat > android/app/src/main/kotlin/com/emobies/emowall/MainActivity.kt << EOF
-          package com.emobies.emowall
-
-          import io.flutter.embedding.android.FlutterFragmentActivity
-
-          class MainActivity: FlutterFragmentActivity()
-          EOF
+          # ക്ലീൻ ആയി തുടങ്ങാൻ പഴയ ആൻഡ്രോയിഡ് ഫോൾഡർ മാറ്റുന്നു
+          rm -rf android
+          flutter create . --platforms=android --org com.emobies --project-name emowall
 
       - name: Flutter pub get
         run: flutter pub get
+
+      - name: Android 15 & Permissions Fix (Crucial for 600 line Code)
+        run: |
+          # 1. MainActivity ഫിക്സ് (Biometrics)
+          mkdir -p android/app/src/main/kotlin/com/emobies/emowall/
+          cat > android/app/src/main/kotlin/com/emobies/emowall/MainActivity.kt << 'EOF'
+          package com.emobies.emowall
+          import io.flutter.embedding.android.FlutterFragmentActivity
+          class MainActivity: FlutterFragmentActivity()
+          EOF
+
+          # 2. AndroidManifest.xml ഫിക്സ് (മൈക്രോഫോൺ പെർമിഷനുകൾ ഇല്ലാതെ speech_to_text വർക്ക് ആവില്ല)
+          cat > android/app/src/main/AndroidManifest.xml << 'EOF'
+          <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.emobies.emowall">
+              <application
+                  android:label="Emowall Pro"
+                  android:name="${applicationName}"
+                  android:icon="@mipmap/ic_launcher">
+                  <activity
+                      android:name=".MainActivity"
+                      android:exported="true"
+                      android:launchMode="singleTop"
+                      android:theme="@style/LaunchTheme"
+                      android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|screenLayout|density|fontScale"
+                      android:hardwareAccelerated="true"
+                      android:windowSoftInputMode="adjustResize">
+                      <intent-filter>
+                          <action android:name="android.intent.action.MAIN"/>
+                          <category android:name="android.intent.category.LAUNCHER"/>
+                      </intent-filter>
+                  </activity>
+                  <meta-data android:name="flutterEmbedding" android:value="2"/>
+              </application>
+              <uses-permission android:name="android.permission.INTERNET"/>
+              <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+              <uses-permission android:name="android.permission.BLUETOOTH"/>
+              <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+              <uses-permission android:name="android.permission.BLUETOOTH_CONNECT"/>
+          </manifest>
+          EOF
 
       - name: Build APK
         run: flutter build apk --release --target-platform android-arm64
@@ -41,5 +78,5 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: emowall-release
+          name: Emowall-Pro-Release
           path: build/app/outputs/flutter-apk/app-release.apk
