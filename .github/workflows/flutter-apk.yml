@@ -25,16 +25,22 @@ jobs:
 
       - name: Specialist Cleanup & Reset
         run: |
-          # ക്ലീൻ ആയി തുടങ്ങാൻ പഴയ ആൻഡ്രോയിഡ് ഫോൾഡർ മാറ്റുന്നു
           rm -rf android
           flutter create . --platforms=android --org com.emobies --project-name emowall
 
-      - name: Flutter pub get
-        run: flutter pub get
-
-      - name: Android 15 & Permissions Fix (Crucial for 600 line Code)
+      - name: Add Missing Packages
         run: |
-          # 1. MainActivity ഫിക്സ് (Biometrics)
+          # കോഡിന് ആവശ്യമുള്ള പാക്കേജുകൾ എല്ലാം ആഡ് ചെയ്യുന്നു
+          flutter pub add speech_to_text audioplayers flutter_tts sensors_plus flutter_local_notifications url_launcher
+          flutter pub get
+
+      - name: FIND THE EXACT ERROR (Flutter Analyze)
+        run: |
+          # നിങ്ങളുടെ കോഡിൽ എവിടെയാണ് തെറ്റുള്ളതെന്ന് ഇത് കൃത്യമായി കണ്ടുപിടിക്കും
+          flutter analyze
+
+      - name: Android 15 & Permissions Fix
+        run: |
           mkdir -p android/app/src/main/kotlin/com/emobies/emowall/
           cat > android/app/src/main/kotlin/com/emobies/emowall/MainActivity.kt << 'EOF'
           package com.emobies.emowall
@@ -42,7 +48,6 @@ jobs:
           class MainActivity: FlutterFragmentActivity()
           EOF
 
-          # 2. AndroidManifest.xml ഫിക്സ് (മൈക്രോഫോൺ പെർമിഷനുകൾ ഇല്ലാതെ speech_to_text വർക്ക് ആവില്ല)
           cat > android/app/src/main/AndroidManifest.xml << 'EOF'
           <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.emobies.emowall">
               <application
