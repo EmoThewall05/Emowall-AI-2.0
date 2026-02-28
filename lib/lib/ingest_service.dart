@@ -1,3 +1,4 @@
+// lib/ingest_service.dart
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:http/http.dart' as http;
@@ -10,20 +11,18 @@ class Presigned {
 }
 
 class IngestService {
-  // Replace these with your real endpoints in production
+  // TODO: replace with real endpoints
   final Uri schoolPresignEndpoint = Uri.parse('https://school.example.com/api/presign');
   final Uri relayIngest = Uri.parse('https://relay.example.com/ingest');
 
-  // For demo only: relay secret must be provisioned securely on device
+  // Demo secret: in production use device attestation or asymmetric keys
   final String relaySecret = 'very_strong_secret_demo';
 
   /// Request presigned URL from school backend (mocked here)
   Future<Presigned?> requestPresignedUrl() async {
     try {
-      // In production, authenticate device and call school backend.
-      // Here we simulate by returning a placeholder signed URL pair.
-      // Replace with real HTTP call to school backend that returns uploadUrl and accessUrl.
-      final uploadUrl = 'https://httpbin.org/put'; // demo: httpbin accepts PUT
+      // Replace with real authenticated call to school backend.
+      final uploadUrl = 'https://httpbin.org/put';
       final accessUrl = 'https://example.com/clip123?exp=1700000000';
       return Presigned(uploadUrl: uploadUrl, accessUrl: accessUrl);
     } catch (e) {
