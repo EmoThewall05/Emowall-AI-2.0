@@ -36,3 +36,7 @@ flutter:
     - assets/sounds/ai_alert.mp3
     - assets/sounds/baby_cry.mp3
     - assets/sounds/baby_song.mp3
+    dependencies:
+  flutter:
+    sdk: flutter
+  intl: ^0.18.1
