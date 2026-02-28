@@ -27,7 +27,9 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   # സൗണ്ട് ഫയൽ ചേർക്കാൻ താഴെ പറയുന്ന ഭാഗം കൂടി ഉപയോഗിക്കാം
-  assets:
-    - assets/sounds/ai_alert.mp3
-    - assets/sounds/baby_cry.mp3
-    - assets/sounds/baby_song.mp3
+  mkdir -p assets/sounds
+touch assets/sounds/ai_alert.mp3
+touch assets/sounds/baby_cry.mp3
+touch assets/sounds/baby_song.mp3
+    
+    
