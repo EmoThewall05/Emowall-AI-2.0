@@ -583,4 +583,105 @@ class _DigitalAmmaScreenState extends State<DigitalAmmaScreen>
                     color: _selectedLanguage == 'malayalam' ? Colors.green : Colors.white24,
                     onTap: () => setState(() => _selectedLanguage = 'malayalam'),
                   ),
-    
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: _ActionButton(
+                    emoji: '🇺🇸',
+                    label: 'English',
+                    color: _selectedLanguage == 'english' ? Colors.green : Colors.white24,
+                    onTap: () => setState(() => _selectedLanguage = 'english'),
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 30),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ActionButton extends StatelessWidget {
+  final String emoji;
+  final String label;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _ActionButton({
+    required this.emoji,
+    required this.label,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final bool isColored = color != Colors.white24;
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          color: isColored ? color.withOpacity(0.15) : const Color(0xFF0D1117),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: isColored ? color.withOpacity(0.6) : Colors.white24),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(emoji, style: const TextStyle(fontSize: 22)),
+            const SizedBox(height: 6),
+            Text(
+              label,
+              style: const TextStyle(color: Colors.white, fontSize: 13),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _LearningCard extends StatelessWidget {
+  final String emoji;
+  final String word;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _LearningCard({
+    required this.emoji,
+    required this.word,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.12),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: color.withOpacity(0.25)),
+        ),
+        padding: const EdgeInsets.all(8),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(emoji, style: const TextStyle(fontSize: 28)),
+            const SizedBox(height: 8),
+            Text(
+              word,
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: Colors.white, fontSize: 12),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
