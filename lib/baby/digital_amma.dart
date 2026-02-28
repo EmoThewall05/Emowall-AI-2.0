@@ -29,7 +29,6 @@ class _DigitalAmmaScreenState extends State<DigitalAmmaScreen>
   late AnimationController _glowController;
   late AnimationController _bounceController;
 
-  // 🎵 Malayalam + English Lullabies
   final Map<String, List<Map<String, String>>> _lullabies = {
     'malayalam': [
       {
@@ -53,7 +52,6 @@ class _DigitalAmmaScreenState extends State<DigitalAmmaScreen>
     ],
   };
 
-  // 💬 Amma Messages — Malayalam + English
   final Map<String, List<String>> _ammaMessages = {
     'comfort': [
       'Kuttiye... Amma ithunde, kandalle! Karayanda mole/mone 🤱',
@@ -110,19 +108,17 @@ class _DigitalAmmaScreenState extends State<DigitalAmmaScreen>
   }
 
   Future<void> _setupTTS() async {
-    await _tts.setLanguage('ml-IN'); // Malayalam default
-    await _tts.setSpeechRate(0.4); // Slow and gentle for babies
-    await _tts.setPitch(1.3); // Higher pitch — amma voice
+    await _tts.setLanguage('ml-IN');
+    await _tts.setSpeechRate(0.4);
+    await _tts.setPitch(1.3);
     await _tts.setVolume(0.9);
   }
 
-  // 🗣️ Amma speaks to baby
   Future<void> _ammaSpeak(String category) async {
     final messages = _ammaMessages[category]!;
     final msg = messages[Random().nextInt(messages.length)];
     setState(() => _ammaMessage = msg);
 
-    // Switch language based on message content heuristics
     if (msg.contains('baby') || msg.contains('you') || msg.contains('Everything')) {
       await _tts.setLanguage('en-US');
     } else {
@@ -131,7 +127,6 @@ class _DigitalAmmaScreenState extends State<DigitalAmmaScreen>
     await _tts.speak(msg);
   }
 
-  // 😢 Baby crying detected — Auto song + Amma speaks
   Future<void> _babyCryingDetected() async {
     if (_isCrying) return;
     setState(() {
@@ -140,14 +135,10 @@ class _DigitalAmmaScreenState extends State<DigitalAmmaScreen>
       _ammaMessage = 'Karayanda kuttiye... Amma paattu paadunnu 🎵';
     });
 
-    // Amma speaks first
     await _ammaSpeak('comfort');
-
-    // Then play lullaby
     await _playLullaby();
   }
 
-  // 🎵 Smart Lullaby Player
   Future<void> _playLullaby() async {
     List<Map<String, String>> songs = [];
 
@@ -165,11 +156,8 @@ class _DigitalAmmaScreenState extends State<DigitalAmmaScreen>
 
     try {
       await _audioPlayer.play(UrlSource(song['url']!));
-    } catch (_) {
-      // ignore play errors silently; keep UI responsive
-    }
+    } catch (_) {}
 
-    // Auto stop after 3 minutes
     Future.delayed(const Duration(minutes: 3), () {
       if (mounted && _isCrying) {
         _audioPlayer.stop();
@@ -178,18 +166,15 @@ class _DigitalAmmaScreenState extends State<DigitalAmmaScreen>
     });
   }
 
-  // 📱 Phone protection sensors
   void _startSensors() {
     _accelerometerSub = userAccelerometerEventStream().listen((event) {
       final total = event.x.abs() + event.y.abs() + event.z.abs();
 
-      // Freefall = phone dropped
       if (total < 1.5 && _babyModeActive) {
         _ammaSpeak('phone_warning');
         setState(() => _ammaMessage = '📱 Phone dropped! Careful kuttiye! 🚨');
       }
 
-      // Heavy shake = baby playing rough
       if (total > 28.0 && _babyModeActive) {
         _ammaSpeak('phone_warning');
       }
@@ -240,7 +225,6 @@ class _DigitalAmmaScreenState extends State<DigitalAmmaScreen>
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         actions: [
-          // Special mode toggle
           GestureDetector(
             onTap: () => setState(() => _isSpecialMode = !_isSpecialMode),
             child: Container(
@@ -269,7 +253,6 @@ class _DigitalAmmaScreenState extends State<DigitalAmmaScreen>
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-            // 👩 Amma Face Animation
             AnimatedBuilder(
               animation: _glowController,
               builder: (_, __) => Container(
@@ -313,7 +296,6 @@ class _DigitalAmmaScreenState extends State<DigitalAmmaScreen>
 
             const SizedBox(height: 20),
 
-            // 💬 Amma Message Box
             AnimatedContainer(
               duration: const Duration(milliseconds: 500),
               width: double.infinity,
@@ -357,10 +339,8 @@ class _DigitalAmmaScreenState extends State<DigitalAmmaScreen>
 
             const SizedBox(height: 20),
 
-            // 🎮 Action Buttons Row
             Row(
               children: [
-                // Baby crying button
                 Expanded(
                   child: _ActionButton(
                     emoji: '😢',
@@ -370,7 +350,6 @@ class _DigitalAmmaScreenState extends State<DigitalAmmaScreen>
                   ),
                 ),
                 const SizedBox(width: 12),
-                // Motivation button
                 Expanded(
                   child: _ActionButton(
                     emoji: '⭐',
@@ -386,7 +365,6 @@ class _DigitalAmmaScreenState extends State<DigitalAmmaScreen>
 
             Row(
               children: [
-                // Learning button
                 Expanded(
                   child: _ActionButton(
                     emoji: '📚',
@@ -396,7 +374,6 @@ class _DigitalAmmaScreenState extends State<DigitalAmmaScreen>
                   ),
                 ),
                 const SizedBox(width: 12),
-                // Calm button (autism support)
                 Expanded(
                   child: _ActionButton(
                     emoji: '🌈',
@@ -410,7 +387,6 @@ class _DigitalAmmaScreenState extends State<DigitalAmmaScreen>
 
             const SizedBox(height: 20),
 
-            // 🌈 Special Needs / Autism Mode
             if (_isSpecialMode) ...[
               Container(
                 width: double.infinity,
@@ -438,7 +414,6 @@ class _DigitalAmmaScreenState extends State<DigitalAmmaScreen>
                       style: TextStyle(color: Colors.white70, fontSize: 13),
                     ),
                     const SizedBox(height: 16),
-                    // Breathing exercise
                     GestureDetector(
                       onTap: () async {
                         await _tts.setLanguage('ml-IN');
@@ -476,7 +451,6 @@ class _DigitalAmmaScreenState extends State<DigitalAmmaScreen>
               const SizedBox(height: 20),
             ],
 
-            // 📱 Visual Learning Cards
             const Align(
               alignment: Alignment.centerLeft,
               child: Text(
@@ -550,7 +524,6 @@ class _DigitalAmmaScreenState extends State<DigitalAmmaScreen>
 
             const SizedBox(height: 20),
 
-            // 🟢 Main Activate Button
             GestureDetector(
               onTap: _babyModeActive ? _deactivateBabyMode : _activateBabyMode,
               child: AnimatedContainer(
@@ -580,4 +553,34 @@ class _DigitalAmmaScreenState extends State<DigitalAmmaScreen>
                   _babyModeActive
                       ? '🛑 Deactivate Amma Mode'
                       : '👩‍👶 Activate Digital Amma',
-                  textAlign: TextAl
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            Row(
+              children: [
+                Expanded(
+                  child: _ActionButton(
+                    emoji: '🌐',
+                    label: 'Both',
+                    color: _selectedLanguage == 'both' ? Colors.green : Colors.white24,
+                    onTap: () => setState(() => _selectedLanguage = 'both'),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: _ActionButton(
+                    emoji: '🇮🇳',
+                    label: 'Malayalam',
+                    color: _selectedLanguage == 'malayalam' ? Colors.green : Colors.white24,
+                    onTap: () => setState(() => _selectedLanguage = 'malayalam'),
+                  ),
+    
