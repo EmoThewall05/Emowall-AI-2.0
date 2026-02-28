@@ -11,6 +11,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      FLUTTER_SUPPRESS_ANALYTICS: 'true'   # suppress telemetry prompt
+      PUB_ENVIRONMENT: 'github_actions'
 
     steps:
       - name: Checkout
@@ -22,10 +25,15 @@ jobs:
           distribution: temurin
           java-version: '11'
 
-      - name: Install Flutter
+      - name: Install Flutter (pin explicit version)
         uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.10.6'
+
+      - name: Verify Flutter
+        run: |
+          flutter --version
+          flutter config --no-analytics
 
       - name: Cache Pub packages
         uses: actions/cache@v4
