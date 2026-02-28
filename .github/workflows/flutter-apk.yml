@@ -12,7 +12,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      FLUTTER_SUPPRESS_ANALYTICS: 'true'   # suppress telemetry prompt
+      FLUTTER_SUPPRESS_ANALYTICS: 'true'
       PUB_ENVIRONMENT: 'github_actions'
 
     steps:
@@ -28,7 +28,7 @@ jobs:
       - name: Install Flutter (pin explicit version)
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.10.6'
+          flutter-version: '3.10.9'   # change this to a release that includes Dart >=3.3 if you choose Option B
 
       - name: Verify Flutter
         run: |
