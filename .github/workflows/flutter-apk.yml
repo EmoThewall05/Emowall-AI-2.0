@@ -28,7 +28,7 @@ jobs:
       - name: Install Flutter (explicit version)
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.7.12'
+          flutter-version: '3.10.6'   # pin a release that includes Dart >=3.0.6
 
       - name: Verify Flutter
         run: |
