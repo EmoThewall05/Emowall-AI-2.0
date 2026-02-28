@@ -27,7 +27,6 @@
             </intent-filter>
         </activity>
 
-        <!-- Optional: keep this if using Flutter's background execution or plugins -->
         <meta-data android:name="flutterEmbedding" android:value="2" />
     </application>
 </manifest>
