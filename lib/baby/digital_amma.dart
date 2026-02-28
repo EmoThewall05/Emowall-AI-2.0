@@ -122,8 +122,8 @@ class _DigitalAmmaScreenState extends State<DigitalAmmaScreen>
     final msg = messages[Random().nextInt(messages.length)];
     setState(() => _ammaMessage = msg);
 
-    // Switch language based on message
-    if (msg.contains('baby') || msg.contains('you')) {
+    // Switch language based on message content heuristics
+    if (msg.contains('baby') || msg.contains('you') || msg.contains('Everything')) {
       await _tts.setLanguage('en-US');
     } else {
       await _tts.setLanguage('ml-IN');
@@ -158,9 +158,16 @@ class _DigitalAmmaScreenState extends State<DigitalAmmaScreen>
       songs.addAll(_lullabies['english']!);
     }
 
+    if (songs.isEmpty) return;
+
     final song = songs[Random().nextInt(songs.length)];
     setState(() => _ammaMessage = '🎵 Playing: ${song['title']}');
-    await _audioPlayer.play(UrlSource(song['url']!));
+
+    try {
+      await _audioPlayer.play(UrlSource(song['url']!));
+    } catch (_) {
+      // ignore play errors silently; keep UI responsive
+    }
 
     // Auto stop after 3 minutes
     Future.delayed(const Duration(minutes: 3), () {
@@ -545,9 +552,7 @@ class _DigitalAmmaScreenState extends State<DigitalAmmaScreen>
 
             // 🟢 Main Activate Button
             GestureDetector(
-              onTap: _babyModeActive
-                  ? _deactivateBabyMode
-                  : _activateBabyMode,
+              onTap: _babyModeActive ? _deactivateBabyMode : _activateBabyMode,
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 300),
                 width: double.infinity,
@@ -564,9 +569,7 @@ class _DigitalAmmaScreenState extends State<DigitalAmmaScreen>
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: (_babyModeActive
-                              ? Colors.red
-                              : const Color(0xFF00FF88))
+                      color: (_babyModeActive ? Colors.red : const Color(0xFF00FF88))
                           .withOpacity(0.4),
                       blurRadius: 20,
                       spreadRadius: 2,
@@ -577,6 +580,4 @@ class _DigitalAmmaScreenState extends State<DigitalAmmaScreen>
                   _babyModeActive
                       ? '🛑 Deactivate Amma Mode'
                       : '👩‍👶 Activate Digital Amma',
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color
+                  textAlign: TextAl
