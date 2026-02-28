@@ -1,12 +1,9 @@
-import 'dart:convert';
+// lib/main.dart
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:crypto/crypto.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_sound/flutter_sound.dart';
-
 import 'ingest_service.dart';
 
 void main() {
@@ -18,7 +15,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Child Safety Demo',
+      title: 'Emowall + Safety Demo',
       theme: ThemeData(primarySwatch: Colors.blue),
       home: const HomePage(),
     );
@@ -56,7 +53,7 @@ class _HomePageState extends State<HomePage> {
     return '${dir.path}/clip_${DateTime.now().millisecondsSinceEpoch}.aac';
   }
 
-  Future<void> _recordAndSend() async {
+  Future<void> _simulatePanic() async {
     if (!_recReady) return;
     final path = await _getTempFilePath();
     try {
@@ -69,7 +66,6 @@ class _HomePageState extends State<HomePage> {
         codec: Codec.aacADTS,
         sampleRate: 16000,
       );
-      // record 8 seconds (example)
       await Future.delayed(const Duration(seconds: 8));
       await _recorder.stopRecorder();
       setState(() {
@@ -79,16 +75,14 @@ class _HomePageState extends State<HomePage> {
 
       final bytes = await File(path).readAsBytes();
 
-      // 1) Request presigned URL from school backend (mocked here)
       final presigned = await _ingest.requestPresignedUrl();
       if (presigned == null) {
         setState(() {
-          _status = 'presigned request failed';
+          _status = 'presign failed';
         });
         return;
       }
 
-      // 2) Upload to presigned URL
       final ok = await _ingest.uploadToPresigned(presigned.uploadUrl, bytes);
       if (!ok) {
         setState(() {
@@ -97,10 +91,9 @@ class _HomePageState extends State<HomePage> {
         return;
       }
 
-      // 3) Build payload and send ingest to relay
       final payload = {
         'incident_token': 'inc-${DateTime.now().millisecondsSinceEpoch}',
-        'device_id': 'device-001',
+        'device_id': 'emowall-device-001',
         'signals': {
           'pulse': {'value': 120, 'quality': 0.85},
           'audio': {'cry': true, 'confidence': 0.88}
@@ -137,7 +130,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Child Safety Demo'),
+        title: const Text('Emowall + Safety Demo'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
@@ -146,13 +139,11 @@ class _HomePageState extends State<HomePage> {
             Text('Status: $_status'),
             const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: _recording ? null : _recordAndSend,
+              onPressed: _recording ? null : _simulatePanic,
               child: Text(_recording ? 'Recording...' : 'Simulate Panic Event'),
             ),
             const SizedBox(height: 12),
-            const Text(
-              'This demo records a short clip, uploads to presigned URL, then posts signed metadata to relay.',
-            ),
+            const Text('This demo records a short clip, uploads to presigned URL, then posts signed metadata to relay.'),
           ],
         ),
       ),
