@@ -25,10 +25,10 @@ jobs:
           distribution: temurin
           java-version: '11'
 
-      - name: Install Flutter (pin explicit version)
+      - name: Install Flutter (explicit version)
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.10.9'
+          flutter-version: '3.7.12'
 
       - name: Verify Flutter
         run: |
