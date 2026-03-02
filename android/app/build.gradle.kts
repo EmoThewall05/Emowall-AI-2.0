@@ -42,3 +42,19 @@ android {
 flutter {
     source = "../.."
 }
+
+android {
+    signingConfigs {
+        create("release") {
+            storeFile = file(System.getenv("STORE_FILE") ?: "release.keystore")
+            storePassword = System.getenv("STORE_PASSWORD") ?: ""
+            keyAlias = System.getenv("KEY_ALIAS") ?: ""
+            keyPassword = System.getenv("KEY_PASSWORD") ?: ""
+        }
+    }
+    buildTypes {
+        release {
+            signingConfig = signingConfigs.getByName("release")
+        }
+    }
+}
