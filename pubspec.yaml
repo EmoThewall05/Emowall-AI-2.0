@@ -1,29 +1,15 @@
 name: emowall
-description: Emowall Pro - Premium Crypto & Staking Tracker with child-safety demo
-version: 1.0.6+106
+description: Emowall AI 2.0
 publish_to: 'none'
+version: 1.0.7+107
 
 environment:
-  sdk: '>=3.0.6 <4.0.0'
+  sdk: '>=3.0.0 <4.0.0'
 
 dependencies:
   flutter:
     sdk: flutter
-  google_fonts: ^8.0.2
-  flutter_secure_storage: ^10.0.0
-  local_auth: ^3.0.1
-  http: ^1.2.1
-  connectivity_plus: ^7.0.0
-  flutter_local_notifications: ^20.1.0
-  sensors_plus: ^7.0.0
-  audioplayers: ^6.0.0
-  url_launcher: ^6.0.0
-
-  crypto: ^3.0.2
-  convert: ^3.0.2
-  path_provider: ^2.0.15
-  permission_handler: ^10.4.0
-  flutter_sound: ^9.2.13
+  intl: ^0.18.1
 
 dev_dependencies:
   flutter_test:
@@ -36,7 +22,3 @@ flutter:
     - assets/sounds/ai_alert.mp3
     - assets/sounds/baby_cry.mp3
     - assets/sounds/baby_song.mp3
-    dependencies:
-  flutter:
-    sdk: flutter
-  intl: ^0.18.1
