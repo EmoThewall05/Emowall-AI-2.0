@@ -12,8 +12,8 @@ class Presigned {
 
 class IngestService {
   // TODO: replace with real endpoints
-  final Uri schoolPresignEndpoint = Uri.parse('https://school.example.com/api/presign');
-  final Uri relayIngest = Uri.parse('https://relay.example.com/ingest');
+  final Uri schoolPresignEndpoint = Uri.parse('https://emobies-ap-135-production.up.railway.app/api/presign');
+  final Uri relayIngest = Uri.parse(emobies-ap-135-production.up.railway.app);
 
   // Demo secret: in production use device attestation or asymmetric keys
   final String relaySecret = 'very_strong_secret_demo';
