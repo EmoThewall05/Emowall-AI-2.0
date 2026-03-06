@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'baby/digital_amma.dart';
+import 'child/child_doctor_ai.dart';
+import 'care/guardian_ai.dart';
+import 'lib/screens/health/womens_health_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -13,7 +17,7 @@ class EmowallApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Emowall Guardian',
+      title: 'Emowall AI',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
@@ -33,7 +37,7 @@ class ModeSelectionScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFF07080B),
       body: SafeArea(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -41,12 +45,48 @@ class ModeSelectionScreen extends StatelessWidget {
               const SizedBox(height: 20),
               Text('Emowall', style: GoogleFonts.syne(fontSize: 36, fontWeight: FontWeight.w800, color: const Color(0xFFFF5500))),
               Text('Your Silent Guardian', style: GoogleFonts.jetBrainsMono(fontSize: 12, color: const Color(0xFF8892A4))),
-              const SizedBox(height: 40),
+              const SizedBox(height: 8),
+              Text('AI 2.0', style: GoogleFonts.jetBrainsMono(fontSize: 11, color: const Color(0xFF00E676))),
+              const SizedBox(height: 32),
+
+              // Safety Modes
+              Text('🛡️ Safety', style: GoogleFonts.syne(fontSize: 13, fontWeight: FontWeight.w700, color: const Color(0xFF8892A4))),
+              const SizedBox(height: 12),
               _modeCard(context, '🛡️', 'Guardian Mode', 'Children & Women Safety', const Color(0xFF3B82F6), const GuardianModeScreen()),
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
               _modeCard(context, '⚔️', 'Shield Mode', 'Men, Elderly & College Safety', const Color(0xFF00E676), const ShieldModeScreen()),
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
               _modeCard(context, '♿', 'Care Mode', 'Blind, Deaf & Speech Support', const Color(0xFFA855F7), const CareModeScreen()),
+              const SizedBox(height: 12),
+              _modeCard(context, '🛡️🗣️', 'Guardian AI', 'Voice-activated Elder Care', const Color(0xFF00E5FF), const GuardianAIScreen()),
+
+              const SizedBox(height: 24),
+
+              // Child & Family
+              Text('👶 Child & Family', style: GoogleFonts.syne(fontSize: 13, fontWeight: FontWeight.w700, color: const Color(0xFF8892A4))),
+              const SizedBox(height: 12),
+              _modeCard(context, '👩‍👶', 'Digital Amma', 'Baby Care & Lullabies AI', const Color(0xFFFF4F9A), const DigitalAmmaScreen()),
+              const SizedBox(height: 12),
+              _modeCard(context, '👨‍⚕️', 'Child Doctor AI', 'Child Mental Health & Therapy', const Color(0xFFFFBF24), const ChildDoctorAI()),
+
+              const SizedBox(height: 24),
+
+              // Health
+              Text('💜 Health', style: GoogleFonts.syne(fontSize: 13, fontWeight: FontWeight.w700, color: const Color(0xFF8892A4))),
+              const SizedBox(height: 12),
+              _modeCard(context, '♀️', "Women's Health", 'Gentle Health Companion', const Color(0xFFFF4F9A), const WomensHealthAIScreen()),
+
+              const SizedBox(height: 32),
+
+              // Footer
+              Center(
+                child: Text(
+                  '🦋 Emowall AI 2.0 — Your Family\'s Guardian',
+                  style: GoogleFonts.jetBrainsMono(fontSize: 10, color: const Color(0xFF8892A4)),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              const SizedBox(height: 16),
             ],
           ),
         ),
@@ -111,7 +151,6 @@ class _GuardianModeScreenState extends State<GuardianModeScreen> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            // SOS Button
             GestureDetector(
               onLongPress: _sendSOS,
               child: Container(
@@ -133,16 +172,12 @@ class _GuardianModeScreenState extends State<GuardianModeScreen> {
             const SizedBox(height: 20),
             Text(_status, style: GoogleFonts.jetBrainsMono(fontSize: 12, color: const Color(0xFF8892A4))),
             const SizedBox(height: 24),
-
-            // Feature toggles
             _featureToggle('🗺️ Safe Zone', 'Alert when boundary crossed', _safeZoneOn, (v) => setState(() => _safeZoneOn = v), const Color(0xFF3B82F6)),
             const SizedBox(height: 12),
             _featureToggle('🎤 Sound Detection', 'Detect crying/aggression', _soundDetectOn, (v) => setState(() => _soundDetectOn = v), const Color(0xFFFBBF24)),
             const SizedBox(height: 12),
             _featureToggle('🛡️ Active Protection', 'Enable all monitoring', _active, (v) => setState(() { _active = v; _status = v ? '🟢 Protection ACTIVE' : 'Protection OFF'; }), const Color(0xFF00E676)),
             const SizedBox(height: 24),
-
-            // Emergency contacts
             _sectionTitle('📞 Emergency Contacts'),
             _contactCard('Parent/Guardian', '+91 98478 42172', const Color(0xFF3B82F6)),
             const SizedBox(height: 8),
@@ -164,20 +199,14 @@ class _GuardianModeScreenState extends State<GuardianModeScreen> {
   Widget _featureToggle(String title, String subtitle, bool value, Function(bool) onChanged, Color color) {
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color(0xFF111519),
-        border: Border.all(color: color.withOpacity(0.2)),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(title, style: GoogleFonts.syne(fontWeight: FontWeight.w700, color: Colors.white)),
-            Text(subtitle, style: GoogleFonts.jetBrainsMono(fontSize: 10, color: const Color(0xFF8892A4))),
-          ])),
-          Switch(value: value, onChanged: onChanged, activeColor: color),
-        ],
-      ),
+      decoration: BoxDecoration(color: const Color(0xFF111519), border: Border.all(color: color.withOpacity(0.2)), borderRadius: BorderRadius.circular(12)),
+      child: Row(children: [
+        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(title, style: GoogleFonts.syne(fontWeight: FontWeight.w700, color: Colors.white)),
+          Text(subtitle, style: GoogleFonts.jetBrainsMono(fontSize: 10, color: const Color(0xFF8892A4))),
+        ])),
+        Switch(value: value, onChanged: onChanged, activeColor: color),
+      ]),
     );
   }
 
@@ -232,7 +261,6 @@ class _ShieldModeScreenState extends State<ShieldModeScreen> {
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(children: [
-          // Quick SOS
           ElevatedButton.icon(
             onPressed: _quickSOS,
             icon: const Icon(Icons.sos, size: 28),
@@ -251,7 +279,6 @@ class _ShieldModeScreenState extends State<ShieldModeScreen> {
           const SizedBox(height: 12),
           _featureToggle('🚗 Accident Detection', 'Detect sudden impact', _accidentDetect, (v) => setState(() => _accidentDetect = v), const Color(0xFF00E676)),
           const SizedBox(height: 24),
-          // Evidence recorder
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(color: const Color(0xFF111519), border: Border.all(color: const Color(0xFFFBBF24).withOpacity(0.3)), borderRadius: BorderRadius.circular(12)),
@@ -263,14 +290,14 @@ class _ShieldModeScreenState extends State<ShieldModeScreen> {
                 Expanded(child: OutlinedButton.icon(
                   onPressed: () {},
                   icon: const Icon(Icons.mic, color: Color(0xFFFBBF24)),
-                  label: Text('Record Audio', style: TextStyle(color: const Color(0xFFFBBF24))),
+                  label: const Text('Record Audio', style: TextStyle(color: Color(0xFFFBBF24))),
                   style: OutlinedButton.styleFrom(side: const BorderSide(color: Color(0xFFFBBF24))),
                 )),
                 const SizedBox(width: 8),
                 Expanded(child: OutlinedButton.icon(
                   onPressed: () {},
                   icon: const Icon(Icons.videocam, color: Color(0xFFFBBF24)),
-                  label: Text('Record Video', style: TextStyle(color: const Color(0xFFFBBF24))),
+                  label: const Text('Record Video', style: TextStyle(color: Color(0xFFFBBF24))),
                   style: OutlinedButton.styleFrom(side: const BorderSide(color: Color(0xFFFBBF24))),
                 )),
               ]),
