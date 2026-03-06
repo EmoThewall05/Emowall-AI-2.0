@@ -599,3 +599,73 @@ class _GuardianAIScreenState extends State<GuardianAIScreen>
                         ),
                         child: Text(
                           '$_painLevel / 10',
+
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Slider(
+                    value: _painLevel.toDouble(),
+                    min: 0,
+                    max: 10,
+                    divisions: 10,
+                    activeColor: Colors.red,
+                    onChanged: (v) => setState(() => _painLevel = v.toInt()),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _BigAlertButton extends StatelessWidget {
+  final String emoji;
+  final String label;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _BigAlertButton({
+    required this.emoji,
+    required this.label,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.15),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: color.withOpacity(0.6)),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(emoji, style: const TextStyle(fontSize: 32)),
+            const SizedBox(height: 8),
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

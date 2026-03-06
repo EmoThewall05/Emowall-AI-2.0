@@ -598,3 +598,54 @@ class _ChildDoctorAIState extends State<ChildDoctorAI>
                     colors: _isListening
                         ? [Colors.red.shade700, Colors.red.shade900]
               
+
+                        : [const Color(0xFF00E5FF), const Color(0xFF7C3AED)],
+                  ),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Text(
+                  _isListening ? '🛑 Stop Listening' : '🎙️ Talk to Doctor',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 30),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _MoodButton extends StatelessWidget {
+  final String emoji;
+  final int value;
+  final int current;
+  final Function(int) onTap;
+
+  const _MoodButton(this.emoji, this.value, this.current, this.onTap);
+
+  @override
+  Widget build(BuildContext context) {
+    final selected = value == current;
+    return GestureDetector(
+      onTap: () => onTap(value),
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: selected ? Colors.white12 : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: selected ? Colors.white38 : Colors.transparent,
+          ),
+        ),
+        child: Text(emoji, style: const TextStyle(fontSize: 28)),
+      ),
+    );
+  }
+}
