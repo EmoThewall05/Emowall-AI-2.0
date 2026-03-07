@@ -44,7 +44,6 @@ class ModeSelectionScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 20),
-              // 🦋 Butterfly Logo — Animated
               const Center(child: ButterflyLogo(size: 70)),
               const SizedBox(height: 16),
               Text('Emowall', style: GoogleFonts.syne(fontSize: 36, fontWeight: FontWeight.w800, color: const Color(0xFFFF5500))),
@@ -52,8 +51,6 @@ class ModeSelectionScreen extends StatelessWidget {
               const SizedBox(height: 8),
               Text('AI 2.0', style: GoogleFonts.jetBrainsMono(fontSize: 11, color: const Color(0xFF00E676))),
               const SizedBox(height: 32),
-
-              // Safety Modes
               Text('🛡️ Safety', style: GoogleFonts.syne(fontSize: 13, fontWeight: FontWeight.w700, color: const Color(0xFF8892A4))),
               const SizedBox(height: 12),
               _modeCard(context, '🛡️', 'Guardian Mode', 'Children & Women Safety', const Color(0xFF3B82F6), const GuardianModeScreen()),
@@ -63,26 +60,17 @@ class ModeSelectionScreen extends StatelessWidget {
               _modeCard(context, '♿', 'Care Mode', 'Blind, Deaf & Speech Support', const Color(0xFFA855F7), const CareModeScreen()),
               const SizedBox(height: 12),
               _modeCard(context, '🛡️🗣️', 'Guardian AI', 'Voice-activated Elder Care', const Color(0xFF00E5FF), const GuardianAIScreen()),
-
               const SizedBox(height: 24),
-
-              // Child & Family
               Text('👶 Child & Family', style: GoogleFonts.syne(fontSize: 13, fontWeight: FontWeight.w700, color: const Color(0xFF8892A4))),
               const SizedBox(height: 12),
               _modeCard(context, '👩‍👶', 'Digital Amma', 'Baby Care & Lullabies AI', const Color(0xFFFF4F9A), const DigitalAmmaScreen()),
               const SizedBox(height: 12),
               _modeCard(context, '👨‍⚕️', 'Child Doctor AI', 'Child Mental Health & Therapy', const Color(0xFFFFBF24), const ChildDoctorAI()),
-
               const SizedBox(height: 24),
-
-              // Health
               Text('💜 Health', style: GoogleFonts.syne(fontSize: 13, fontWeight: FontWeight.w700, color: const Color(0xFF8892A4))),
               const SizedBox(height: 12),
               _modeCard(context, '♀️', "Women's Health", 'Gentle Health Companion', const Color(0xFFFF4F9A), const WomensHealthAIScreen()),
-
               const SizedBox(height: 32),
-
-              // Footer — Butterfly animated + text
               Center(
                 child: Column(
                   children: [
@@ -148,6 +136,10 @@ class _GuardianModeScreenState extends State<GuardianModeScreen> {
   bool _soundDetectOn = false;
   String _status = 'Protection OFF';
 
+  List<Map<String, String>> _contacts = [
+    {'name': 'Parent/Guardian', 'phone': '+91 98478 42172'},
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -188,10 +180,22 @@ class _GuardianModeScreenState extends State<GuardianModeScreen> {
             const SizedBox(height: 12),
             _featureToggle('🛡️ Active Protection', 'Enable all monitoring', _active, (v) => setState(() { _active = v; _status = v ? '🟢 Protection ACTIVE' : 'Protection OFF'; }), const Color(0xFF00E676)),
             const SizedBox(height: 24),
-            _sectionTitle('📞 Emergency Contacts'),
-            _contactCard('Parent/Guardian', '+91 98478 42172', const Color(0xFF3B82F6)),
+            // Emergency Contacts
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('📞 Emergency Contacts', style: GoogleFonts.syne(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.white)),
+                IconButton(
+                  onPressed: () => _showAddContactDialog(context),
+                  icon: const Icon(Icons.add_circle, color: Color(0xFFFF5500), size: 28),
+                ),
+              ],
+            ),
             const SizedBox(height: 8),
-            _addContactButton(context),
+            ..._contacts.asMap().entries.map((entry) => Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: _contactCard(entry.value['name']!, entry.value['phone']!, entry.key),
+            )),
           ],
         ),
       ),
@@ -203,6 +207,92 @@ class _GuardianModeScreenState extends State<GuardianModeScreen> {
     HapticFeedback.heavyImpact();
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('🚨 SOS Alert sent to emergency contacts!'), backgroundColor: Color(0xFFEF4444)),
+    );
+  }
+
+  // ✅ Add Contact Dialog
+  void _showAddContactDialog(BuildContext context, {int? editIndex}) {
+    final nameController = TextEditingController(
+      text: editIndex != null ? _contacts[editIndex]['name'] : '',
+    );
+    final phoneController = TextEditingController(
+      text: editIndex != null ? _contacts[editIndex]['phone'] : '',
+    );
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFF111519),
+        title: Text(
+          editIndex != null ? 'Edit Contact' : 'Add Contact',
+          style: const TextStyle(color: Colors.white),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: nameController,
+              style: const TextStyle(color: Colors.white),
+              decoration: const InputDecoration(
+                labelText: 'Name',
+                labelStyle: TextStyle(color: Color(0xFF8892A4)),
+                enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFFFF5500))),
+                focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFFFF5500))),
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: phoneController,
+              keyboardType: TextInputType.phone,
+              style: const TextStyle(color: Colors.white),
+              decoration: const InputDecoration(
+                labelText: 'Phone Number',
+                labelStyle: TextStyle(color: Color(0xFF8892A4)),
+                enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFFFF5500))),
+                focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFFFF5500))),
+                hintText: '+91 XXXXX XXXXX',
+                hintStyle: TextStyle(color: Color(0xFF8892A4)),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel', style: TextStyle(color: Color(0xFF8892A4))),
+          ),
+          if (editIndex != null)
+            TextButton(
+              onPressed: () {
+                setState(() => _contacts.removeAt(editIndex));
+                Navigator.pop(ctx);
+              },
+              child: const Text('Delete', style: TextStyle(color: Color(0xFFEF4444))),
+            ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFF5500)),
+            onPressed: () {
+              if (nameController.text.isNotEmpty && phoneController.text.isNotEmpty) {
+                setState(() {
+                  if (editIndex != null) {
+                    _contacts[editIndex] = {
+                      'name': nameController.text,
+                      'phone': phoneController.text,
+                    };
+                  } else {
+                    _contacts.add({
+                      'name': nameController.text,
+                      'phone': phoneController.text,
+                    });
+                  }
+                });
+                Navigator.pop(ctx);
+              }
+            },
+            child: Text(editIndex != null ? 'Save' : 'Add', style: const TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
     );
   }
 
@@ -220,30 +310,21 @@ class _GuardianModeScreenState extends State<GuardianModeScreen> {
     );
   }
 
-  Widget _sectionTitle(String title) => Padding(
-    padding: const EdgeInsets.only(bottom: 12),
-    child: Text(title, style: GoogleFonts.syne(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.white)),
-  );
-
-  Widget _contactCard(String name, String phone, Color color) => Container(
+  Widget _contactCard(String name, String phone, int index) => Container(
     padding: const EdgeInsets.all(14),
-    decoration: BoxDecoration(color: const Color(0xFF111519), border: Border.all(color: color.withOpacity(0.3)), borderRadius: BorderRadius.circular(12)),
+    decoration: BoxDecoration(color: const Color(0xFF111519), border: Border.all(color: const Color(0xFF3B82F6).withOpacity(0.3)), borderRadius: BorderRadius.circular(12)),
     child: Row(children: [
-      Icon(Icons.person, color: color),
+      const Icon(Icons.person, color: Color(0xFF3B82F6)),
       const SizedBox(width: 12),
       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(name, style: GoogleFonts.syne(fontWeight: FontWeight.w700, color: Colors.white)),
         Text(phone, style: GoogleFonts.jetBrainsMono(fontSize: 11, color: const Color(0xFF8892A4))),
       ])),
-      Icon(Icons.edit, color: color, size: 18),
+      IconButton(
+        onPressed: () => _showAddContactDialog(context, editIndex: index),
+        icon: const Icon(Icons.edit, color: Color(0xFF3B82F6), size: 18),
+      ),
     ]),
-  );
-
-  Widget _addContactButton(BuildContext context) => OutlinedButton.icon(
-    onPressed: () {},
-    icon: const Icon(Icons.add, color: Color(0xFFFF5500)),
-    label: Text('Add Emergency Contact', style: GoogleFonts.syne(color: const Color(0xFFFF5500))),
-    style: OutlinedButton.styleFrom(side: const BorderSide(color: Color(0xFFFF5500)), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
   );
 }
 
@@ -298,14 +379,22 @@ class _ShieldModeScreenState extends State<ShieldModeScreen> {
               const SizedBox(height: 12),
               Row(children: [
                 Expanded(child: OutlinedButton.icon(
-                  onPressed: () {},
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('🎤 Recording audio...'), backgroundColor: Color(0xFFFBBF24)),
+                    );
+                  },
                   icon: const Icon(Icons.mic, color: Color(0xFFFBBF24)),
                   label: const Text('Record Audio', style: TextStyle(color: Color(0xFFFBBF24))),
                   style: OutlinedButton.styleFrom(side: const BorderSide(color: Color(0xFFFBBF24))),
                 )),
                 const SizedBox(width: 8),
                 Expanded(child: OutlinedButton.icon(
-                  onPressed: () {},
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('📹 Recording video...'), backgroundColor: Color(0xFFFBBF24)),
+                    );
+                  },
                   icon: const Icon(Icons.videocam, color: Color(0xFFFBBF24)),
                   label: const Text('Record Video', style: TextStyle(color: Color(0xFFFBBF24))),
                   style: OutlinedButton.styleFrom(side: const BorderSide(color: Color(0xFFFBBF24))),
@@ -341,8 +430,17 @@ class _ShieldModeScreenState extends State<ShieldModeScreen> {
 }
 
 // ==================== CARE MODE ====================
-class CareModeScreen extends StatelessWidget {
+class CareModeScreen extends StatefulWidget {
   const CareModeScreen({super.key});
+  @override
+  State<CareModeScreen> createState() => _CareModeScreenState();
+}
+
+class _CareModeScreenState extends State<CareModeScreen> {
+  bool _blindEnabled = false;
+  bool _deafEnabled = false;
+  bool _speechEnabled = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -361,7 +459,15 @@ class CareModeScreen extends StatelessWidget {
             'Audio GPS navigation',
             'Road crossing AI assistant',
             'Voice confirmation of all actions',
-          ], const Color(0xFF3B82F6), context),
+          ], const Color(0xFF3B82F6), _blindEnabled, (v) {
+            setState(() => _blindEnabled = v);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(v ? '👁️ Blind Support ENABLED' : '👁️ Blind Support disabled'),
+                backgroundColor: const Color(0xFF3B82F6),
+              ),
+            );
+          }),
           const SizedBox(height: 16),
           _careCard('👂', 'Deaf Support', [
             'Strong vibration alerts',
@@ -369,43 +475,71 @@ class CareModeScreen extends StatelessWidget {
             'Visual notifications',
             'Phone screen flash alerts',
             'Sign language video calls',
-          ], const Color(0xFF00E676), context),
+          ], const Color(0xFF00E676), _deafEnabled, (v) {
+            setState(() => _deafEnabled = v);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(v ? '👂 Deaf Support ENABLED' : '👂 Deaf Support disabled'),
+                backgroundColor: const Color(0xFF00E676),
+              ),
+            );
+          }),
           const SizedBox(height: 16),
           _careCard('🗣️', 'Speech Support', [
             'Pre-recorded SOS messages',
             'One button voice message',
             'AI speaks for the user',
             'Picture-based communication',
-          ], const Color(0xFFA855F7), context),
+          ], const Color(0xFFA855F7), _speechEnabled, (v) {
+            setState(() => _speechEnabled = v);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(v ? '🗣️ Speech Support ENABLED' : '🗣️ Speech Support disabled'),
+                backgroundColor: const Color(0xFFA855F7),
+              ),
+            );
+          }),
         ]),
       ),
     );
   }
 
-  Widget _careCard(String emoji, String title, List<String> features, Color color, BuildContext context) {
+  Widget _careCard(String emoji, String title, List<String> features, Color color, bool enabled, Function(bool) onToggle) {
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: const Color(0xFF111519), border: Border.all(color: color.withOpacity(0.3)), borderRadius: BorderRadius.circular(12)),
+      decoration: BoxDecoration(
+        color: const Color(0xFF111519),
+        border: Border.all(color: enabled ? color : color.withOpacity(0.3)),
+        borderRadius: BorderRadius.circular(12),
+      ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
           Text(emoji, style: const TextStyle(fontSize: 28)),
           const SizedBox(width: 12),
-          Text(title, style: GoogleFonts.syne(fontSize: 16, fontWeight: FontWeight.w800, color: Colors.white)),
+          Expanded(child: Text(title, style: GoogleFonts.syne(fontSize: 16, fontWeight: FontWeight.w800, color: Colors.white))),
+          Switch(value: enabled, onChanged: onToggle, activeColor: color),
         ]),
         const SizedBox(height: 12),
         ...features.map((f) => Padding(
           padding: const EdgeInsets.only(bottom: 6),
           child: Row(children: [
-            Icon(Icons.check_circle, color: color, size: 16),
+            Icon(Icons.check_circle, color: enabled ? color : color.withOpacity(0.4), size: 16),
             const SizedBox(width: 8),
             Expanded(child: Text(f, style: GoogleFonts.jetBrainsMono(fontSize: 11, color: const Color(0xFF8892A4)))),
           ]),
         )),
         const SizedBox(height: 12),
         SizedBox(width: double.infinity, child: ElevatedButton(
-          onPressed: () {},
-          style: ElevatedButton.styleFrom(backgroundColor: color, foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
-          child: Text('Enable $title', style: GoogleFonts.syne(fontWeight: FontWeight.w700)),
+          onPressed: () => onToggle(!enabled),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: enabled ? color : color.withOpacity(0.3),
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
+          child: Text(
+            enabled ? '✅ $title Active' : 'Enable $title',
+            style: GoogleFonts.syne(fontWeight: FontWeight.w700),
+          ),
         )),
       ]),
     );
