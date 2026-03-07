@@ -6,6 +6,8 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'dart:async';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class GuardianAIScreen extends StatefulWidget {
   const GuardianAIScreen({super.key});
@@ -24,9 +26,13 @@ class _GuardianAIScreenState extends State<GuardianAIScreen>
 
   bool _isListening = false;
   bool _emergencyMode = false;
+  bool _isThinking = false;
   String _lastHeard = '';
   String _statusMessage = 'Guardian AI Ready 🛡️';
   int _painLevel = 0;
+
+  static const String _apiUrl =
+      'https://emowall-backend-production.up.railway.app/api/chat';
 
   // 👨‍👩‍👧 Family contacts
   final List<Map<String, String>> _familyContacts = [
@@ -64,38 +70,31 @@ class _GuardianAIScreenState extends State<GuardianAIScreen>
   }
 
   Future<void> _initAll() async {
-    // TTS setup — slow gentle voice
     await _tts.setLanguage('ml-IN');
     await _tts.setSpeechRate(0.35);
     await _tts.setPitch(1.1);
     await _tts.setVolume(1.0);
 
-    // Speech recognition
     await _speech.initialize();
 
-    // Notifications
     const android = AndroidInitializationSettings('@mipmap/ic_launcher');
     await _notifications.initialize(
       const InitializationSettings(android: android),
     );
 
-    // Start medicine timer check
     _startMedicineTimer();
 
-    // Welcome message
     await _speak(
       'Guardian AI ready. Ningalkku enthu veenam ennal paranjal mathi. '
       'I am always here for you.',
     );
   }
 
-  // 🗣️ AI speaks
   Future<void> _speak(String text) async {
     setState(() => _statusMessage = text);
     await _tts.speak(text);
   }
 
-  // 👂 Continuous voice listening
   Future<void> _startContinuousListening() async {
     setState(() => _isListening = true);
 
@@ -124,128 +123,120 @@ class _GuardianAIScreenState extends State<GuardianAIScreen>
     setState(() => _isListening = false);
   }
 
-  // 🧠 Process voice commands — Malayalam + English
   void _processVoiceCommand(String command) {
     setState(() => _lastHeard = command);
 
-    // 💧 Water
     if (command.contains('water') ||
         command.contains('വെള്ളം') ||
         command.contains('vellam') ||
         command.contains('drink')) {
       _triggerCareAlert('water');
-    }
-
-    // 🍜 Food
-    else if (command.contains('food') ||
+    } else if (command.contains('food') ||
         command.contains('കഴിക്കാൻ') ||
         command.contains('kazikkan') ||
         command.contains('hungry') ||
         command.contains('വിശക്കുന്നു')) {
       _triggerCareAlert('food');
-    }
-
-    // 💊 Medicine
-    else if (command.contains('medicine') ||
+    } else if (command.contains('medicine') ||
         command.contains('മരുന്ന്') ||
         command.contains('marunn') ||
         command.contains('tablet')) {
       _triggerCareAlert('medicine');
-    }
-
-    // 🤕 Pain
-    else if (command.contains('pain') ||
+    } else if (command.contains('pain') ||
         command.contains('വേദന') ||
         command.contains('vedana') ||
         command.contains('hurt') ||
         command.contains('avastha')) {
       _triggerCareAlert('pain');
-    }
-
-    // 🚨 Emergency
-    else if (command.contains('help') ||
+    } else if (command.contains('help') ||
         command.contains('emergency') ||
         command.contains('സഹായം') ||
         command.contains('sahayam') ||
         command.contains('sos')) {
       _triggerEmergency();
-    }
-
-    // 😰 Stress
-    else if (command.contains('stress') ||
+    } else if (command.contains('stress') ||
         command.contains('tension') ||
         command.contains('സ്ട്രെസ്') ||
         command.contains('worried')) {
       _triggerCareAlert('stress');
+    } else {
+      // 🤖 Unknown command — ask Gemini AI
+      _askGemini(command);
     }
   }
 
-  // 🚨 Care Alert System
+  // 🤖 Ask Gemini AI
+  Future<void> _askGemini(String message) async {
+    setState(() => _isThinking = true);
+    await _speak('Oru nimisham...');
+
+    try {
+      final response = await http.post(
+        Uri.parse(_apiUrl),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'message': message, 'mode': 'guardian'}),
+      ).timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final reply = data['reply'] ?? 'Manapsilayilla, veendum paranjal mathi.';
+        await _speak(reply);
+      } else {
+        await _speak('AI ippol busy aanu. Veendum try cheyyuka.');
+      }
+    } catch (e) {
+      await _speak('Sorry, AI connection failed. Please try again.');
+    } finally {
+      setState(() => _isThinking = false);
+    }
+  }
+
   Future<void> _triggerCareAlert(String type) async {
     final Map<String, Map<String, String>> alerts = {
       'water': {
         'message': '💧 വെള്ളം കുടിക്കണം! Patient needs water!',
         'voice': 'Vellam veenam. Caretaker ine ariyikkunnu!',
         'whatsapp': '💧 ALERT: Patient needs WATER immediately!',
-        'color': 'blue',
       },
       'food': {
         'message': '🍜 ഭക്ഷണം വേണം! Patient needs food!',
         'voice': 'Bhakshanam veenam. Caretaker ine ariyikkunnu!',
         'whatsapp': '🍜 ALERT: Patient needs FOOD now!',
-        'color': 'orange',
       },
       'medicine': {
         'message': '💊 മരുന്ന് സമയമായി! Medicine time!',
         'voice': 'Marunn samayam aayi. Caretaker ine ariyikkunnu!',
         'whatsapp': '💊 ALERT: Patient needs MEDICINE now!',
-        'color': 'green',
       },
       'pain': {
         'message': '🤕 വേദന ഉണ്ട്! Patient is in pain!',
         'voice': 'Vedana undu. Undil caretaker ine vilikkunnu!',
         'whatsapp': '🚨 URGENT: Patient is in PAIN! Please come immediately!',
-        'color': 'red',
       },
       'stress': {
         'message': '😰 Stress detected! Calming patient...',
         'voice':
             'Ningal relax cheyyuka. Breathe slowly. Amma koode undu. Everything is okay.',
         'whatsapp': '😰 ALERT: Patient is stressed. Please check!',
-        'color': 'purple',
       },
     };
 
     final alert = alerts[type]!;
-
-    // 1. Speak to patient first
     await _speak(alert['voice']!);
-
-    // 2. Send notifications
     await _sendNotification(alert['message']!);
-
-    // 3. WhatsApp all family
     await _sendWhatsAppAlert(alert['whatsapp']!);
-
-    // 4. Update UI
     setState(() => _statusMessage = alert['message']!);
   }
 
-  // 🚨 EMERGENCY — calls + WhatsApp + alarm
   Future<void> _triggerEmergency() async {
     setState(() => _emergencyMode = true);
 
-    // Play loud alarm
     await _audioPlayer.play(
       UrlSource('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'),
     );
 
-    // Speak emergency
-    await _speak(
-      'Emergency! Sahayam veenam! Caretaker ine undil vilikkunnu!',
-    );
+    await _speak('Emergency! Sahayam veenam! Caretaker ine undil vilikkunnu!');
 
-    // Notify all contacts
     for (final contact in _familyContacts) {
       await _sendWhatsAppAlert(
         '🚨🚨 EMERGENCY! ${contact['name']} — '
@@ -253,15 +244,11 @@ class _GuardianAIScreenState extends State<GuardianAIScreen>
       );
     }
 
-    // Auto call first family member
     await Future.delayed(const Duration(seconds: 2));
     await _makeEmergencyCall(_familyContacts[0]['phone']!);
-
-    // Send notification
     await _sendNotification('🚨 EMERGENCY! Patient needs help NOW!');
   }
 
-  // 📱 Send local notification
   Future<void> _sendNotification(String message) async {
     const details = NotificationDetails(
       android: AndroidNotificationDetails(
@@ -276,7 +263,6 @@ class _GuardianAIScreenState extends State<GuardianAIScreen>
     await _notifications.show(0, '🛡️ Guardian AI Alert', message, details);
   }
 
-  // 💬 WhatsApp alert
   Future<void> _sendWhatsAppAlert(String message) async {
     for (final contact in _familyContacts) {
       final phone = contact['phone']!.replaceAll('+', '');
@@ -287,7 +273,6 @@ class _GuardianAIScreenState extends State<GuardianAIScreen>
     }
   }
 
-  // 📞 Emergency call
   Future<void> _makeEmergencyCall(String phone) async {
     final url = 'tel:$phone';
     if (await canLaunchUrl(Uri.parse(url))) {
@@ -295,7 +280,6 @@ class _GuardianAIScreenState extends State<GuardianAIScreen>
     }
   }
 
-  // ⏰ Medicine timer
   void _startMedicineTimer() {
     _medicineTimer = Timer.periodic(const Duration(minutes: 1), (_) {
       final now = TimeOfDay.now();
@@ -388,6 +372,35 @@ class _GuardianAIScreenState extends State<GuardianAIScreen>
                 ),
               ),
 
+            // 🤖 AI Thinking indicator
+            if (_isThinking)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(12),
+                margin: const EdgeInsets.only(bottom: 16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF00E5FF).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: const Color(0xFF00E5FF).withOpacity(0.3)),
+                ),
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Color(0xFF00E5FF),
+                      ),
+                    ),
+                    SizedBox(width: 10),
+                    Text('🤖 Gemini AI thinking...',
+                        style: TextStyle(color: Color(0xFF00E5FF), fontSize: 13)),
+                  ],
+                ),
+              ),
+
             // 🎙️ Voice Status
             AnimatedBuilder(
               animation: _pulseController,
@@ -451,8 +464,7 @@ class _GuardianAIScreenState extends State<GuardianAIScreen>
               child: Text(
                 _statusMessage,
                 textAlign: TextAlign.center,
-                style:
-                    const TextStyle(color: Colors.white70, fontSize: 13),
+                style: const TextStyle(color: Colors.white70, fontSize: 13),
               ),
             ),
 
@@ -502,7 +514,7 @@ class _GuardianAIScreenState extends State<GuardianAIScreen>
 
             const SizedBox(height: 20),
 
-            // 🔴 Quick Alert Buttons — big for paralysed people
+            // ⚡ Quick Alert Buttons
             const Align(
               alignment: Alignment.centerLeft,
               child: Text(
@@ -577,13 +589,11 @@ class _GuardianAIScreenState extends State<GuardianAIScreen>
                 children: [
                   Row(
                     children: [
-                      const Text('🤕 ',
-                          style: TextStyle(fontSize: 20)),
+                      const Text('🤕 ', style: TextStyle(fontSize: 20)),
                       const Text(
                         'Pain Level',
                         style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold),
+                            color: Colors.white, fontWeight: FontWeight.bold),
                       ),
                       const Spacer(),
                       Container(
@@ -599,10 +609,8 @@ class _GuardianAIScreenState extends State<GuardianAIScreen>
                         ),
                         child: Text(
                           '$_painLevel / 10',
-
                           style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold),
+                              color: Colors.white, fontWeight: FontWeight.bold),
                         ),
                       ),
                     ],
@@ -614,6 +622,81 @@ class _GuardianAIScreenState extends State<GuardianAIScreen>
                     divisions: 10,
                     activeColor: Colors.red,
                     onChanged: (v) => setState(() => _painLevel = v.toInt()),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            // 🤖 AI Chat Box
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: const Color(0xFF0D1117),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                    color: const Color(0xFF00E5FF).withOpacity(0.3)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Row(
+                    children: [
+                      Text('🤖 ', style: TextStyle(fontSize: 20)),
+                      Text('Ask Guardian AI',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold)),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  const Text('Voice il paranjal AI answer cheyyum',
+                      style: TextStyle(
+                          color: Colors.white38, fontSize: 11)),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF1A1F2E),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Text(
+                            _lastHeard.isEmpty
+                                ? 'Speak something...'
+                                : _lastHeard,
+                            style: TextStyle(
+                              color: _lastHeard.isEmpty
+                                  ? Colors.white24
+                                  : Colors.white70,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      GestureDetector(
+                        onTap: _lastHeard.isEmpty
+                            ? null
+                            : () => _askGemini(_lastHeard),
+                        child: Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF00E5FF).withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                                color: const Color(0xFF00E5FF)
+                                    .withOpacity(0.4)),
+                          ),
+                          child: const Icon(Icons.send,
+                              color: Color(0xFF00E5FF), size: 20),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
