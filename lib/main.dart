@@ -5,6 +5,7 @@ import 'baby/digital_amma.dart';
 import 'child/child_doctor_ai.dart';
 import 'care/guardian_ai.dart';
 import 'lib/screens/health/womens_health_ai_screen.dart';
+import 'widgets/butterfly_logo.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -43,6 +44,9 @@ class ModeSelectionScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 20),
+              // 🦋 Butterfly Logo — Animated
+              const Center(child: ButterflyLogo(size: 70)),
+              const SizedBox(height: 16),
               Text('Emowall', style: GoogleFonts.syne(fontSize: 36, fontWeight: FontWeight.w800, color: const Color(0xFFFF5500))),
               Text('Your Silent Guardian', style: GoogleFonts.jetBrainsMono(fontSize: 12, color: const Color(0xFF8892A4))),
               const SizedBox(height: 8),
@@ -78,12 +82,18 @@ class ModeSelectionScreen extends StatelessWidget {
 
               const SizedBox(height: 32),
 
-              // Footer
+              // Footer — Butterfly animated + text
               Center(
-                child: Text(
-                  '🦋 Emowall AI 2.0 — Your Family\'s Guardian',
-                  style: GoogleFonts.jetBrainsMono(fontSize: 10, color: const Color(0xFF8892A4)),
-                  textAlign: TextAlign.center,
+                child: Column(
+                  children: [
+                    const ButterflyLogo(size: 36),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Emowall AI 2.0 — Your Family\'s Guardian',
+                      style: GoogleFonts.jetBrainsMono(fontSize: 10, color: const Color(0xFF8892A4)),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(height: 16),
