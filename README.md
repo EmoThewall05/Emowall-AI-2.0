@@ -4,9 +4,10 @@
 > Built from Dubai 🇦🇪 · Powered by Seven Brains 🧠 · Made for Kerala 🌿
 
 [![Flutter](https://img.shields.io/badge/Flutter-3.27.0-02569B?logo=flutter)](https://flutter.dev)
-[![Version](https://img.shields.io/badge/Version-1.0.10-00E676)](https://github.com/Emobies05/Emobies-AP-135)
+[![Version](https://img.shields.io/badge/Version-1.0.12-00E676)](https://github.com/Emobies05/Emobies-AP-135)
 [![Platform](https://img.shields.io/badge/Platform-Android-brightgreen?logo=android)](https://play.google.com)
 [![License](https://img.shields.io/badge/License-MIT-FF5500)](LICENSE)
+[![Closed Testing](https://img.shields.io/badge/Play%20Store-Closed%20Testing-blue?logo=googleplay)](https://play.google.com/apps/testing/com.emobies.emowall)
 
 ---
 
@@ -18,7 +19,7 @@ Built entirely on a phone 📱 using Termux + Acode, deployed from Dubai to the 
 
 ---
 
-## 📱 Seven Screens, One App
+## 📱 Eight Screens, One App
 
 | Mode | For | Features |
 |------|-----|----------|
@@ -29,6 +30,20 @@ Built entirely on a phone 📱 using Termux + Acode, deployed from Dubai to the 
 | 👩‍👶 **Digital Amma** | Babies & Mothers | Baby cry detection, Lullabies AI |
 | 👨‍⚕️ **Child Doctor AI** | Children | Mental health, mood tracking, therapy |
 | ♀️ **Women's Health** | Women | Gentle health companion AI |
+| 🔍 **Media Verifier** | Everyone | AI-powered image & video authentication |
+
+---
+
+## 🆕 What's New in v1.0.12
+
+- ✅ **Media Verifier** — Brand new AI forensics feature powered by Gemini Vision
+  - Detects REAL / EDITED / AI_GENERATED media
+  - Supports images (gallery + camera) and videos
+  - Forensic confidence score + detailed analysis
+  - Built-in 10MB file size guard
+- ✅ **API Key Security** — Gemini key now secured via `dart-define` (no hardcoded secrets)
+- ✅ **Women's Health AI** — Import path fixed, fully stable
+- ✅ **Build pipeline** — All CI/CD errors resolved
 
 ---
 
@@ -47,11 +62,12 @@ Emowall AI 2.0 uses a multi-AI architecture where each AI has a specific role.
 ---
 
 ### 🧠 Brain 2 — Gemini (Google)
-**Role: In-App AI Assistant & Voice Intelligence**
+**Role: In-App AI Assistant & Vision Intelligence**
 - Powers the Emowall chatbot inside Emobies app
 - Malayalam + English voice understanding
 - Baby cry detection and child emotion analysis
-- Used for: Real-time in-app AI responses, voice features
+- **Media Verifier forensics** (image/video authentication)
+- Used for: Real-time in-app AI responses, voice features, media analysis
 
 ---
 
@@ -124,12 +140,18 @@ git clone -b Emowall-Ai-2.0 https://github.com/Emobies05/Emobies-AP-135.git
 # Install dependencies
 flutter pub get
 
-# Build AAB
-flutter build appbundle --release
+# Build AAB (with secure API key injection)
+flutter build appbundle --release \
+  --dart-define=GEMINI_API_KEY=$YOUR_GEMINI_KEY
 ```
 
 ### GitHub Actions (Auto Build)
 Every push to `Emowall-Ai-2.0` branch triggers automatic AAB build via `.github/workflows/flutter.yml`
+
+```yaml
+- run: flutter build appbundle --release \
+    --dart-define=GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
+```
 
 ---
 
@@ -137,11 +159,11 @@ Every push to `Emowall-Ai-2.0` branch triggers automatic AAB build via `.github/
 
 ```
 Frontend:    Flutter 3.27.0 (Dart)
-AI:          Gemini API (Google)
+AI:          Gemini API (Google) — Chat + Vision
 Backend:     Node.js + Express (Railway)
 Build:       GitHub Actions
 Store:       Google Play Console
-Fonts:       Syne + JetBrains Mono
+Fonts:       Syne + JetBrains Mono + Space Grotesk
 ```
 
 ---
@@ -156,17 +178,31 @@ flutter_local_notifications  # SOS alerts
 flutter_sound: ^9.2.13       # Audio recording
 google_fonts: ^6.2.1         # Typography
 permission_handler: ^11.0.0  # Device permissions
+image_picker: ^1.0.0         # Media Verifier image/video input
+http: ^1.0.0                 # Gemini API calls
 ```
 
 ---
 
 ## 🛡️ Guardrails (All AIs Must Follow)
 
-- Never hardcode API keys or secrets
+- Never hardcode API keys or secrets — use `dart-define` + GitHub Secrets
 - Keep dark neo-crypto aesthetic (`#07080B`, `#00E5FF`, `#7C3AED`)
 - Never remove ButterflyLogo or core screens
 - Always keep Malayalam + English support
 - Prioritize user safety above all features
+
+---
+
+## 🗺️ Roadmap
+
+| Version | Status | Highlights |
+|---------|--------|------------|
+| 1.0.10 | ✅ Released | Core 7 screens |
+| 1.0.11 | ✅ Closed Testing | Women's Health AI stable |
+| 1.0.12 | 🔄 Uploading | Media Verifier, API security |
+| 1.1.0 | 🔜 Planned | Subscription model, multi-language |
+| Production | 🎯 ~Mar 22 | 14-day closed test complete |
 
 ---
 
@@ -185,4 +221,4 @@ permission_handler: ^11.0.0  # Device permissions
 
 ---
 
-*Package: `com.emobies.emowall` · Version: `1.0.10 (110)` · Min SDK: 24*
+*Package: `com.emobies.emowall` · Version: `1.0.12 (112)` · Min SDK: 24*
