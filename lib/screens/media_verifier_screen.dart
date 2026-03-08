@@ -24,7 +24,7 @@ class _MediaVerifierScreenState extends State<MediaVerifierScreen>
   late Animation<double> _pulseAnimation;
 
   // ✅ Replace with your actual Gemini API Key
-  static const String _geminiApiKey = 'YOUR_GEMINI_API_KEY';
+  static const String _geminiApiKey = 'AIzaSyABjw_uTBfm-VXXnlInP8HHeuyoFloqEM8';
 
   @override
   void initState() {
