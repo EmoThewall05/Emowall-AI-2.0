@@ -1,112 +1,177 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'screens/guardian_mode_screen.dart';
-import 'screens/shield_mode_screen.dart';
-import 'screens/care_mode_screen.dart';
-import 'screens/child_doctor_screen.dart';
-import 'screens/digital_amma_screen.dart';
-import 'screens/womens_health_screen.dart';
-import 'screens/guardian_ai_screen.dart';
+import 'baby/digital_amma.dart';
+import 'child/child_doctor_ai.dart';
+import 'care/guardian_ai.dart';
+import 'Health/womens_health_ai_screen.dart';
+import 'widgets/butterfly_logo.dart';
 import 'screens/media_verifier_screen.dart';
 
-void main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-    DeviceOrientation.portraitDown,
-  ]);
-  SystemChrome.setSystemUIOverlayStyle(
-    const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.light,
-      systemNavigationBarColor: Color(0xFF07080B),
-      systemNavigationBarIconBrightness: Brightness.light,
-    ),
-  );
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   runApp(const EmowallApp());
 }
 
 class EmowallApp extends StatelessWidget {
   const EmowallApp({super.key});
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Emowall AI 2.0',
+      title: 'Emowall AI',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        brightness: Brightness.dark,
-        scaffoldBackgroundColor: const Color(0xFF07080B),
-        colorScheme: const ColorScheme.dark(
-          primary: Color(0xFF00E5FF),
-          secondary: Color(0xFF7C3AED),
-          surface: Color(0xFF0D0D1A),
-        ),
-        textTheme: GoogleFonts.spaceGroteskTextTheme(
-          ThemeData.dark().textTheme,
-        ),
         useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFFFF5500)),
+        scaffoldBackgroundColor: const Color(0xFF07080B),
       ),
-      home: const SplashScreen(),
+      home: const ModeSelectionScreen(),
     );
   }
 }
 
-// ══════════════════════════════════════════
-// SPLASH SCREEN
-// ══════════════════════════════════════════
-class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key});
-
-  @override
-  State<SplashScreen> createState() => _SplashScreenState();
-}
-
-class _SplashScreenState extends State<SplashScreen>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _fadeAnimation;
-  late Animation<double> _scaleAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 1800),
-      vsync: this,
-    );
-    _fadeAnimation = Tween<double>(begin: 0, end: 1).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeIn),
-    );
-    _scaleAnimation = Tween<double>(begin: 0.7, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.elasticOut),
-    );
-    _controller.forward();
-    Future.delayed(const Duration(seconds: 3), () {
-      if (mounted) {
-        Navigator.pushReplacement(
-          context,
-          PageRouteBuilder(
-            pageBuilder: (_, __, ___) => const HomeScreen(),
-            transitionsBuilder: (_, animation, __, child) =>
-                FadeTransition(opacity: animation, child: child),
-            transitionDuration: const Duration(milliseconds: 600),
-          ),
-        );
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
+// ==================== MODE SELECTION ====================
+class ModeSelectionScreen extends StatelessWidget {
+  const ModeSelectionScreen({super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFF07080B),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 20),
+              const Center(child: ButterflyLogo(size: 70)),
+              const SizedBox(height: 16),
+              Text('Emowall', style: GoogleFonts.syne(fontSize: 36, fontWeight: FontWeight.w800, color: const Color(0xFFFF5500))),
+              Text('Your Silent Guardian', style: GoogleFonts.jetBrainsMono(fontSize: 12, color: const Color(0xFF8892A4))),
+              const SizedBox(height: 8),
+              Text('AI 2.0', style: GoogleFonts.jetBrainsMono(fontSize: 11, color: const Color(0xFF00E676))),
+              const SizedBox(height: 32),
+              Text('🛡️ Safety', style: GoogleFonts.syne(fontSize: 13, fontWeight: FontWeight.w700, color: const Color(0xFF8892A4))),
+              const SizedBox(height: 12),
+              _modeCard(context, '🛡️', 'Guardian Mode', 'Children & Women Safety', const Color(0xFF3B82F6), const GuardianModeScreen()),
+              const SizedBox(height: 12),
+              _modeCard(context, '⚔️', 'Shield Mode', 'Men, Elderly & College Safety', const Color(0xFF00E676), const ShieldModeScreen()),
+              const SizedBox(height: 12),
+              _modeCard(context, '♿', 'Care Mode', 'Blind, Deaf & Speech Support', const Color(0xFFA855F7), const CareModeScreen()),
+              const SizedBox(height: 12),
+              _modeCard(context, '🛡️🗣️', 'Guardian AI', 'Voice-activated Elder Care', const Color(0xFF00E5FF), const GuardianAIScreen()),
+              const SizedBox(height: 24),
+              Text('👶 Child & Family', style: GoogleFonts.syne(fontSize: 13, fontWeight: FontWeight.w700, color: const Color(0xFF8892A4))),
+              const SizedBox(height: 12),
+              _modeCard(context, '👩‍👶', 'Digital Amma', 'Baby Care & Lullabies AI', const Color(0xFFFF4F9A), const DigitalAmmaScreen()),
+              const SizedBox(height: 12),
+              _modeCard(context, '👨‍⚕️', 'Child Doctor AI', 'Child Mental Health & Therapy', const Color(0xFFFFBF24), const ChildDoctorAI()),
+              const SizedBox(height: 24),
+              Text('💜 Health', style: GoogleFonts.syne(fontSize: 13, fontWeight: FontWeight.w700, color: const Color(0xFF8892A4))),
+              const SizedBox(height: 12),
+              _modeCard(context, '♀️', "Women's Health", 'Gentle Health Companion', const Color(0xFFFF4F9A), const WomensHealthAIScreen()),
+              const SizedBox(height: 24),
+              Text('🔍 AI Tools', style: GoogleFonts.syne(fontSize: 13, fontWeight: FontWeight.w700, color: const Color(0xFF8892A4))),
+              const SizedBox(height: 12),
+              _modeCardNew(context, '🔍', 'Media Verifier', 'AI Deepfake & Edit Detection', const Color(0xFFE040FB), const MediaVerifierScreen()),
+              const SizedBox(height: 32),
+              Center(
+                child: Column(
+                  children: [
+                    const ButterflyLogo(size: 36),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Emowall AI 2.0 — Your Family\'s Guardian',
+                      style: GoogleFonts.jetBrainsMono(fontSize: 10, color: const Color(0xFF8892A4)),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _modeCard(BuildContext context, String emoji, String title, String subtitle, Color color, Widget screen) {
+    return GestureDetector(
+      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => screen)),
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: const Color(0xFF111519),
+          border: Border.all(color: color.withOpacity(0.4)),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Row(
+          children: [
+            Text(emoji, style: const TextStyle(fontSize: 36)),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, style: GoogleFonts.syne(fontSize: 18, fontWeight: FontWeight.w700, color: Colors.white)),
+                  Text(subtitle, style: GoogleFonts.jetBrainsMono(fontSize: 10, color: const Color(0xFF8892A4))),
+                ],
+              ),
+            ),
+            Icon(Icons.arrow_forward_ios, color: color, size: 16),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ── NEW card with NEW badge ──
+  Widget _modeCardNew(BuildContext context, String emoji, String title, String subtitle, Color color, Widget screen) {
+    return GestureDetector(
+      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => screen)),
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: const Color(0xFF111519),
+          border: Border.all(color: color.withOpacity(0.6)),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Row(
+          children: [
+            Text(emoji, style: const TextStyle(fontSize: 36)),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(title, style: GoogleFonts.syne(fontSize: 18, fontWeight: FontWeight.w700, color: Colors.white)),
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: color.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(6),
+                          border: Border.all(color: color.withOpacity(0.6)),
+                        ),
+                        child: Text('NEW', style: GoogleFonts.syne(fontSize: 8, color: color, fontWeight: FontWeight.bold, letterSpacing: 1)),
+                      ),
+                    ],
+                  ),
+                  Text(subtitle, style: GoogleFonts.jetBrainsMono(fontSize: 10, color: const Color(0xFF8892A4))),
+                ],
+              ),
+            ),
+            Icon(Icons.arrow_forward_ios, color: color, size: 16),
+          ],
+        ),
+      ),
+    );
+  }
+}
       backgroundColor: const Color(0xFF07080B),
       body: Center(
         child: FadeTransition(
