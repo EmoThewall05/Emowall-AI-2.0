@@ -20,7 +20,7 @@ jobs:
       - name: Build AAB
         run: |
           flutter build appbundle --release \
-            --dart-define=GEMINI_API_KEY=${{ AIzaSyABjw_uTBfm-VXXnlInP8HHeuyoFloqEM8 }}
+            --dart-define=GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
         env:
           STORE_FILE: release.keystore
           STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
