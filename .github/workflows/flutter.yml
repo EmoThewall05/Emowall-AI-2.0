@@ -18,8 +18,9 @@ jobs:
       - name: Decode keystore
         run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > android/app/release.keystore
       - name: Build AAB
-        run: flutter build appbundle --release
-         --dart-define=GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
+        run: |
+          flutter build appbundle --release \
+            --dart-define=GEMINI_API_KEY=${{ AIzaSyABjw_uTBfm-VXXnlInP8HHeuyoFloqEM8 }}
         env:
           STORE_FILE: release.keystore
           STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
