@@ -6,7 +6,7 @@ import 'child/child_doctor_ai.dart';
 import 'care/guardian_ai.dart';
 import 'Health/womens_health_ai.dart';
 import 'widgets/butterfly_logo.dart';
-import 'screens/media_verifier_screen.dart';
+import 'screens/media_verifier_ai.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
