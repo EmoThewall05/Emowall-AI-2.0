@@ -1,12 +1,12 @@
-import 'package:flutter/material.dart'
-import 'package:flutter/services.dart'
-import 'google_fonts/google_fonts.dart'
-import 'baby/digital_amma.dart';
-import 'child/child_doctor_ai.dart';
-import 'care/guardian_ai.dart';
-import 'health/women_ai.dart';
-import 'widgets/butterfly_logo.dart'
-import 'screens/media_verifier_ai.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';  // ← fix this line
+import 'package:emowall/baby/digital_amma.dart';
+import 'package:emowall/child/child_doctor_ai.dart';
+import 'package:emowall/care/guardian_ai.dart';
+import 'package:emowall/health/women_ai.dart';
+import 'package:emowall/widgets/butterfly_logo.dart';
+import 'package:emowall/screens/media_verifier_ai.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
