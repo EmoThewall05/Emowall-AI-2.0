@@ -25,6 +25,8 @@ dependencies:
   crypto: ^3.0.3
   http: ^1.2.0
   image_picker: ^1.0.7
+  firebase_auth: ^4.x.x
+  google_sign_in: ^6.x.x
 
 dev_dependencies:
   flutter_test:
