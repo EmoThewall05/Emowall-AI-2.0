@@ -1,4 +1,4 @@
-name: Flutter APK
+Name: Flutter APK
 on:
   push:
     branches: [Emowall-Ai-2.0]
@@ -20,6 +20,8 @@ jobs:
       - name: Build AAB
         run: |
           flutter build appbundle --release \
+            --build-name=2.0.1 \
+            --build-number=2 \
             --dart-define=GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
         env:
           STORE_FILE: release.keystore
