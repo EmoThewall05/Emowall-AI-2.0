@@ -16,15 +16,21 @@ dependencies:
   # UI Enhancement & Icons
   cupertino_icons: ^1.0.8
   google_fonts: ^6.2.1
-  flutter_animate: ^4.5.2 # For Butterfly and UI animations
+  flutter_animate: ^4.5.2
 
   # Core Backend & Logic
-  http: ^1.2.2 # For Seven Brains AI API calls
-  url_launcher: ^6.3.1 # For SOS and external links (Safest way for Play Store)
+  http: ^1.2.2
+  url_launcher: ^6.3.1
   
+  # Sensor & Hardware Features (Digital Amma / Guardian AI)
+  sensors_plus: ^6.1.1       # To detect motion/baby movement
+  flutter_tts: ^4.2.2        # Text-to-Speech for AI voice
+  speech_to_text: ^7.0.0     # Voice commands input
+  flutter_local_notifications: ^18.0.1 # SOS and alerts
+
   # Audio & Media
-  audioplayers: ^5.2.1 # For Butterfly wing flap sounds/alerts
-  image_picker: ^1.1.2 # For Deepfake/Image analysis features
+  audioplayers: ^5.2.1
+  image_picker: ^1.1.2
 
   # Authentication & Security
   firebase_core: ^3.10.1
@@ -38,8 +44,6 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-
-  # Asset linking - Make sure these files exist in your assets folder
   assets:
     - assets/
     - assets/orange_cyan_butterfly.png
