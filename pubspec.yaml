@@ -1,8 +1,6 @@
 name: emowall
 description: "Emowall AI 2.0 - The Living Fortress AI Guardian"
 publish_to: 'none'
-
-# Version 2.0.1 and Build 2 for Play Store update
 version: 2.0.1+2
 
 environment:
@@ -12,27 +10,17 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
-  # UI Enhancement & Icons
   cupertino_icons: ^1.0.8
   google_fonts: ^6.2.1
   flutter_animate: ^4.5.2
-
-  # Core Backend & Logic
   http: ^1.2.2
   url_launcher: ^6.3.1
-  
-  # Sensor & Hardware Features (Digital Amma / Guardian AI)
-  sensors_plus: ^6.1.1       # To detect motion/baby movement
-  flutter_tts: ^4.2.2        # Text-to-Speech for AI voice
-  speech_to_text: ^7.0.0     # Voice commands input
-  flutter_local_notifications: ^18.0.1 # SOS and alerts
-
-  # Audio & Media
+  sensors_plus: ^6.1.1
+  flutter_tts: ^4.2.2
+  speech_to_text: ^7.0.0
+  flutter_local_notifications: ^18.0.1
   audioplayers: ^5.2.1
   image_picker: ^1.1.2
-
-  # Authentication & Security
   firebase_core: ^3.10.1
   firebase_auth: ^5.4.1
   google_sign_in: ^6.2.2
@@ -46,4 +34,4 @@ flutter:
   uses-material-design: true
   assets:
     - assets/
-    - assets/orange_cyan_butterfly.png
+    # - assets/orange_cyan_butterfly.png (ഇത് താൽക്കാലികമായി ഹൈഡ് ചെയ്തു)
