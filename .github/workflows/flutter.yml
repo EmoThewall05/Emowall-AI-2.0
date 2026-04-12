@@ -1,4 +1,4 @@
-Name: Flutter APK
+name: Flutter APK
 on:
   push:
     branches: [Emowall-Ai-2.0]
