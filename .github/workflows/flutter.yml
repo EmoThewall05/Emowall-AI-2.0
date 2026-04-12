@@ -1,43 +1,29 @@
-name: emowall
-description: "Emowall AI 2.0 - Multi-Chain Gasless Web3 Wallet & AI Guardian"
-publish_to: 'none'
-
-# Version: 2.0.1 is the name, 2 is the build number for Play Store
-version: 2.0.1+2
-
-environment:
-  sdk: '>=3.6.0 <4.0.0'
-  flutter: '>=3.27.0'
-
-dependencies:
-  flutter:
-    sdk: flutter
-
-  # Firebase & Auth
-  firebase_core: ^4.6.0
-  firebase_auth: ^6.1.4
-  google_sign_in: ^6.2.1
-
-  # UI & Core
-  cupertino_icons: ^1.0.6
-  google_fonts: ^6.2.1
-  flutter_animate: ^4.5.0
-  audioplayers: ^5.2.1
-  url_launcher: ^6.2.5
-
-  # AI & Media
-  http: ^1.2.2
-  image_picker: ^1.1.2
-
-dev_dependencies:
-  flutter_test:
-    sdk: flutter
-  flutter_lints: ^3.0.0
-
-flutter:
-  uses-material-design: true
-  
-  # Ensure your assets are correctly linked here
-  assets:
-    - assets/
-    - assets/orange_cyan_butterfly.png
+name: Flutter APK
+on:
+  push:
+    branches: [Emowall-Ai-2.0]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.27.0'
+          channel: 'stable'
+      - run: flutter pub get
+      - name: Decode keystore
+        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > android/app/release.keystore
+      - name: Build AAB
+        run: |
+          flutter build appbundle --release \
+            --dart-define=GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
+        env:
+          STORE_FILE: release.keystore
+          STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-aab
+          path: build/app/outputs/bundle/release/app-release.aab
