@@ -1,30 +1,40 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'controllers/butterfly_controller.dart'; // നിന്റെ ButterflyController
+import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:emowall/widgets/butterfly_logo.dart'; // നിന്റെ ശലഭത്തിന്റെ ലോഗോ വിഡ്ജറ്റ്
+import 'auth_service.dart';
 
-class EmoLoginScreen extends StatefulWidget {
-  const EmoLoginScreen({super.key});
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
 
   @override
-  State<EmoLoginScreen> createState() => _EmoLoginScreenState();
+  State<LoginPage> createState() => _LoginPageState();
 }
 
-class _EmoLoginScreenState extends State<EmoLoginScreen>
-    with TickerProviderStateMixin {
+class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
+  final AuthService _authService = AuthService();
+  final _formKey = GlobalKey<FormState>();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+
+  bool _isLogin = true;
+  bool _isLoading = false;
+  bool _obscurePassword = true;
+  String? _errorMessage;
+
   late AnimationController _glowController;
-  late Animation<double> _glowOpacity;
+  late Animation<double> _glowAnimation;
 
   @override
   void initState() {
     super.initState();
-
-    // ⭐ Divine Glow Animation for the Butterfly
+    // ശലഭത്തിന്റെ തിളക്കത്തിന് വേണ്ടിയുള്ള ആനിമേഷൻ
     _glowController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 2000),
+      duration: const Duration(seconds: 2),
     )..repeat(reverse: true);
 
-    _glowOpacity = Tween<double>(begin: 0.4, end: 0.9).animate(
+    _glowAnimation = Tween<double>(begin: 0.3, end: 0.8).animate(
       CurvedAnimation(parent: _glowController, curve: Curves.easeInOut),
     );
   }
@@ -32,137 +42,114 @@ class _EmoLoginScreenState extends State<EmoLoginScreen>
   @override
   void dispose() {
     _glowController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
     super.dispose();
+  }
+
+  // ── Auth Actions ───────────────────────────────────────────
+  Future<void> _submitEmailAuth() async {
+    if (!_formKey.currentState!.validate()) return;
+    setState(() { _isLoading = true; _errorMessage = null; });
+
+    try {
+      if (_isLogin) {
+        await _authService.signInWithEmail(
+          email: _emailController.text, password: _passwordController.text,
+        );
+      } else {
+        await _authService.signUpWithEmail(
+          email: _emailController.text, password: _passwordController.text,
+        );
+      }
+      if (mounted) Navigator.of(context).pushReplacementNamed('/home');
+    } catch (e) {
+      setState(() => _errorMessage = e.toString());
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    // ⭐ നിന്റെ ButterflyState watch ചെയ്യുക (നിറം മാറ്റാൻ)
-    final butterfly = context.watch<ButterflyState>();
-
     return Scaffold(
-      backgroundColor: const Color(0xFF030307), // അതീവ കറുത്ത ബാക്ക്ഗ്രൗണ്ട്
-      body: Stack(
-        children: [
-          // Background Decor (ഒരു ചെറിയ നീല വെളിച്ചം)
-          Positioned(
-            top: -100,
-            left: -100,
-            child: Container(
-              width: 300,
-              height: 300,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: const Color(0xFF00f2ff).withOpacity(0.05),
-                blurRadius: 100,
-              ),
-            ),
-          ),
-
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Spacer(),
-
-                  // ⭐ The Pulsing Butterfly Guardian
-                  AnimatedBuilder(
-                    animation: _glowOpacity,
-                    builder: (context, child) {
-                      return Container(
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: butterfly.glowColor
-                                  .withOpacity(_glowOpacity.value),
-                              blurRadius: 50,
-                              spreadRadius: 15,
-                            ),
-                          ],
-                        ),
-                        child: Image.asset(
-                          'assets/thewall_butterfly.png', // നിന്റെ ശലഭത്തിന്റെ ചിത്രം
-                          width: 150,
-                          height: 150,
-                        ),
-                      );
-                    },
-                  ),
-
-                  const SizedBox(height: 30),
-
-                  // Title & Subtitle
-                  const Text(
-                    "EMO AI PRO",
-                    style: TextStyle(
-                      fontFamily: 'SpaceGrotesk', // നീ ഉപയോഗിക്കുന്ന ഫോണ്ട്
-                      fontSize: 32,
-                      fontWeight: FontWeight.w900,
-                      color: Colors.white,
-                      letterSpacing: 1.5,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    "Your Emotionally Intelligent Guardian",
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.white.withOpacity(0.6),
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-
-                  const SizedBox(height: 60),
-
-                  // Login Options Box
-                  Container(
-                    padding: const EdgeInsets.all(24),
+      backgroundColor: const Color(0xFF07080B),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 30),
+          child: Column(
+            children: [
+              const SizedBox(height: 20),
+              // ⭐ നിന്റെ സിഗ്നേച്ചർ ബട്ടർഫ്ലൈ ആനിമേഷൻ
+              AnimatedBuilder(
+                animation: _glowAnimation,
+                builder: (context, child) {
+                  return Container(
                     decoration: BoxDecoration(
-                      color: const Color(0xFF13131A), // ഡാർക്ക് കാർഡ് കളർ
-                      borderRadius: BorderRadius.circular(24),
-                      border: Border.all(color: Colors.white.withOpacity(0.05)),
-                    ),
-                    child: Column(
-                      children: [
-                        // Google Login Button
-                        _buildLoginButton(
-                          icon: 'assets/google_logo.png', // ഗൂഗിൾ ലോഗോ
-                          label: "Continue with Google",
-                          onPressed: () {
-                            // TODO: Implement Google Sign-In
-                          },
-                        ),
-                        const SizedBox(height: 16),
-                        // WalletConnect Button (Web3 Integration)
-                        _buildLoginButton(
-                          icon: 'assets/walletconnect_logo.png', // വാർലെറ്റ് കണക്ട് ലോഗോ
-                          label: "Connect with WalletConnect",
-                          onPressed: () {
-                            // TODO: Implement WalletConnect
-                          },
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFFFF5500).withOpacity(_glowAnimation.value),
+                          blurRadius: 40,
+                          spreadRadius: 5,
                         ),
                       ],
                     ),
-                  ),
-
-                  const Spacer(),
-
-                  // Footer Meta
-                  Text(
-                    "BUILT ON MOBILE • DXB 🇦🇪",
-                    style: TextStyle(
-                      fontSize: 10,
-                      color: Colors.white.withOpacity(0.3),
-                      letterSpacing: 2,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                ],
+                    child: const ButterflyLogo(size: 85),
+                  );
+                },
               ),
+              const SizedBox(height: 24),
+              Text('Emowall AI', style: GoogleFonts.syne(fontSize: 32, fontWeight: FontWeight.w800, color: const Color(0xFFFF5500))),
+              Text('YOUR SILENT GUARDIAN', style: GoogleFonts.jetBrainsMono(fontSize: 10, color: const Color(0xFF8892A4), letterSpacing: 2)),
+              const SizedBox(height: 40),
+              
+              _buildForm(),
+              
+              if (_errorMessage != null) _buildError(),
+              const SizedBox(height: 32),
+              
+              _buildSubmitButton(),
+              const SizedBox(height: 24),
+              _buildGoogleButton(),
+              const SizedBox(height: 32),
+              
+              _buildToggle(),
+              const SizedBox(height: 40),
+              
+              // DXB to Kerala Connection Meta
+              Text(
+                "BUILT ON MOBILE • DXB 🇦🇪 IND 🇮🇳",
+                style: GoogleFonts.jetBrainsMono(fontSize: 9, color: Colors.white.withOpacity(0.2), letterSpacing: 2, fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildForm() {
+    return Form(
+      key: _formKey,
+      child: Column(
+        children: [
+          _buildTextField(
+            controller: _emailController,
+            label: 'Guardian Email',
+            icon: Icons.mail_outline_rounded,
+            hint: 'email@emowall.ai',
+          ),
+          const SizedBox(height: 18),
+          _buildTextField(
+            controller: _passwordController,
+            label: 'Secure Password',
+            icon: Icons.lock_outline_rounded,
+            obscureText: _obscurePassword,
+            hint: '••••••••',
+            suffixIcon: IconButton(
+              icon: Icon(_obscurePassword ? Icons.visibility_off : Icons.visibility, color: const Color(0xFF8892A4), size: 18),
+              onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
             ),
           ),
         ],
@@ -170,39 +157,85 @@ class _EmoLoginScreenState extends State<EmoLoginScreen>
     );
   }
 
-  Widget _buildLoginButton({
-    required String icon,
-    required String label,
-    required VoidCallback onPressed,
-  }) {
-    return SizedBox(
-      width: double.infinity,
-      height: 55,
-      child: OutlinedButton(
-        onPressed: onPressed,
-        style: OutlinedButton.styleStyle(
-          side: BorderSide(color: Colors.white.withOpacity(0.1)),
-          backgroundColor: const Color(0xFF1E1E26),
-          shape: RoundedRectangleType(
-            borderRadius: BorderRadius.circular(16),
+  Widget _buildTextField({required TextEditingController controller, required String label, required IconData icon, required String hint, bool obscureText = false, Widget? suffixIcon}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: GoogleFonts.jetBrainsMono(color: const Color(0xFF8892A4), fontSize: 11)),
+        const SizedBox(height: 8),
+        TextFormField(
+          controller: controller,
+          obscureText: obscureText,
+          style: const TextStyle(color: Colors.white, fontSize: 15),
+          decoration: InputDecoration(
+            hintText: hint,
+            hintStyle: const TextStyle(color: Color(0xFF333344)),
+            prefixIcon: Icon(icon, color: const Color(0xFFFF5500), size: 20),
+            suffixIcon: suffixIcon,
+            filled: true,
+            fillColor: const Color(0xFF111519),
+            contentPadding: const EdgeInsets.all(18),
+            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: Colors.white.withOpacity(0.05))),
+            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: Color(0xFFFF5500))),
           ),
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+      ],
+    );
+  }
+
+  Widget _buildSubmitButton() {
+    return SizedBox(
+      width: double.infinity, height: 56,
+      child: ElevatedButton(
+        onPressed: _isLoading ? null : _submitEmailAuth,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFFFF5500),
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          elevation: 0,
+        ),
+        child: _isLoading 
+          ? const CircularProgressIndicator(color: Colors.white) 
+          : Text(_isLogin ? 'ENTER FORTRESS' : 'CREATE ACCOUNT', style: GoogleFonts.syne(fontWeight: FontWeight.w800, fontSize: 15)),
+      ),
+    );
+  }
+
+  Widget _buildGoogleButton() {
+    return SizedBox(
+      width: double.infinity, height: 56,
+      child: OutlinedButton.icon(
+        onPressed: _isLoading ? null : () {}, // Google Logic
+        icon: const Icon(Icons.g_mobiledata, size: 30, color: Colors.white),
+        label: Text('Continue with Google', style: GoogleFonts.syne(color: Colors.white, fontSize: 14)),
+        style: OutlinedButton.styleFrom(
+          side: BorderSide(color: Colors.white.withOpacity(0.1)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          backgroundColor: const Color(0xFF111519),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildToggle() {
+    return GestureDetector(
+      onTap: () => setState(() { _isLogin = !_isLogin; _errorMessage = null; }),
+      child: RichText(
+        text: TextSpan(
+          text: _isLogin ? "New Guardian? " : "Already Secured? ",
+          style: GoogleFonts.jetBrainsMono(color: const Color(0xFF8892A4), fontSize: 12),
           children: [
-            Image.asset(icon, width: 22, height: 22),
-            const SizedBox(width: 12),
-            Text(
-              label,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+            TextSpan(text: _isLogin ? 'Register Now' : 'Sign In', style: const TextStyle(color: Color(0xFFFF5500), fontWeight: FontWeight.bold)),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildError() {
+    return Padding(
+      padding: const EdgeInsets.only(top: 16),
+      child: Text(_errorMessage!, style: const TextStyle(color: Colors.redAccent, fontSize: 12)),
     );
   }
 }
