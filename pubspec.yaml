@@ -2,7 +2,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  # Firebase (updated for compatibility)
+  # Firebase
   firebase_core: ^4.6.0
   firebase_auth: ^6.1.4
   google_sign_in: ^6.2.1
@@ -11,6 +11,13 @@ dependencies:
   cupertino_icons: ^1.0.6
   google_fonts: ^6.2.1
 
+  # Animation & Sound (ബട്ടർഫ്ലൈ അനിമേഷന് വേണ്ടി ഇത് അത്യാവശ്യമാണ്)
+  flutter_animate: ^4.5.0
+  audioplayers: ^5.2.1
+
   # Gemini AI + Media Verifier
   http: ^1.2.2
   image_picker: ^1.1.2
+  
+  # Permission issues പരിഹരിക്കാൻ (SMS/Call intent-ന് വേണ്ടി)
+  url_launcher: ^6.2.5
