@@ -222,3 +222,4 @@ http: ^1.0.0                 # Gemini API calls
 ---
 
 *Package: `com.emobies.emowall` · Version: `1.0.12 (112)` · Min SDK: 24*
+https://emobies05.github.io/public-/emowall_standalone_updated.html
