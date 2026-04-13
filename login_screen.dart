@@ -110,10 +110,16 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
               const SizedBox(height: 32),
               
               _buildSubmitButton(),
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
+              _buildDivider(),
+              const SizedBox(height: 20),
               _buildGoogleButton(),
-              const SizedBox(height: 32),
+              const SizedBox(height: 12),
               
+              // 🛡️ Wallet Connection for 540+ Wallets
+              _buildWalletButton(),
+              
+              const SizedBox(height: 32),
               _buildToggle(),
               const SizedBox(height: 40),
               
@@ -196,46 +202,4 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
         ),
         child: _isLoading 
           ? const CircularProgressIndicator(color: Colors.white) 
-          : Text(_isLogin ? 'ENTER FORTRESS' : 'CREATE ACCOUNT', style: GoogleFonts.syne(fontWeight: FontWeight.w800, fontSize: 15)),
-      ),
-    );
-  }
-
-  Widget _buildGoogleButton() {
-    return SizedBox(
-      width: double.infinity, height: 56,
-      child: OutlinedButton.icon(
-        onPressed: _isLoading ? null : () {}, // Google Logic
-        icon: const Icon(Icons.g_mobiledata, size: 30, color: Colors.white),
-        label: Text('Continue with Google', style: GoogleFonts.syne(color: Colors.white, fontSize: 14)),
-        style: OutlinedButton.styleFrom(
-          side: BorderSide(color: Colors.white.withOpacity(0.1)),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          backgroundColor: const Color(0xFF111519),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildToggle() {
-    return GestureDetector(
-      onTap: () => setState(() { _isLogin = !_isLogin; _errorMessage = null; }),
-      child: RichText(
-        text: TextSpan(
-          text: _isLogin ? "New Guardian? " : "Already Secured? ",
-          style: GoogleFonts.jetBrainsMono(color: const Color(0xFF8892A4), fontSize: 12),
-          children: [
-            TextSpan(text: _isLogin ? 'Register Now' : 'Sign In', style: const TextStyle(color: Color(0xFFFF5500), fontWeight: FontWeight.bold)),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildError() {
-    return Padding(
-      padding: const EdgeInsets.only(top: 16),
-      child: Text(_errorMessage!, style: const TextStyle(color: Colors.redAccent, fontSize: 12)),
-    );
-  }
-}
+          : Text(_isLogin ? 'ENTER FORTRESS' : 'CREATE ACCOUNT', style: GoogleFonts.syne(fontWeight: FontWeight.w800, fontSize:
