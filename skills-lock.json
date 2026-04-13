@@ -5,6 +5,11 @@
       "source": "ColosseumOrg/colosseum-copilot",
       "sourceType": "github",
       "computedHash": "7859139478a5276c63a6114f0c3f9899ca4a30b5e4239825d16b92e8744e9e07"
+    },
+    "use-railway": {
+      "source": "railwayapp/railway-skills",
+      "sourceType": "github",
+      "computedHash": "c1a12a7b4914878399c0d634c49498fdb3bff1d91ef2c125932491bde3a4190a"
     }
   }
 }
