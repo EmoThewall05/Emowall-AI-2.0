@@ -1,426 +1,68 @@
+// ... (നിന്റെ നിലവിലുള്ള ഇംപോർട്ടുകൾ നിലനിർത്തുക)
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'auth_service.dart';
+// വാലറ്റ് കണക്ടിവിറ്റിക്ക് വേണ്ടിയുള്ള പാക്കേജ് ഇംപോർട്ട് ചെയ്യുക (reown/walletconnect)
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
-
-  @override
-  State<LoginPage> createState() => _LoginPageState();
-}
-
-class _LoginPageState extends State<LoginPage>
-    with SingleTickerProviderStateMixin {
-  final AuthService _authService = AuthService();
-  final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-
-  bool _isLogin = true; // toggle between Login / Sign Up
-  bool _isLoading = false;
-  bool _obscurePassword = true;
-  String? _errorMessage;
-
-  late AnimationController _animController;
-  late Animation<double> _fadeAnim;
-
-  // ── Palette ────────────────────────────────────────────────────────────────
-  static const _bg = Color(0xFF0A0A14);
-  static const _surface = Color(0xFF12121F);
-  static const _accent = Color(0xFF7C4DFF);
-  static const _accentSoft = Color(0xFF9D72FF);
-  static const _textPrimary = Color(0xFFEEEEFF);
-  static const _textSecondary = Color(0xFF7878A0);
-  static const _border = Color(0xFF2A2A40);
-
-  @override
-  void initState() {
-    super.initState();
-    _animController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 900),
-    );
-    _fadeAnim = CurvedAnimation(
-      parent: _animController,
-      curve: Curves.easeOut,
-    );
-    _animController.forward();
-  }
-
-  @override
-  void dispose() {
-    _animController.dispose();
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
-  }
-
-  // ── Auth Actions ───────────────────────────────────────────────────────────
-
-  Future<void> _submitEmailAuth() async {
-    if (!_formKey.currentState!.validate()) return;
-    setState(() {
-      _isLoading = true;
-      _errorMessage = null;
-    });
-
-    try {
-      if (_isLogin) {
-        await _authService.signInWithEmail(
-          email: _emailController.text,
-          password: _passwordController.text,
-        );
-      } else {
-        await _authService.signUpWithEmail(
-          email: _emailController.text,
-          password: _passwordController.text,
-        );
-      }
-      if (mounted) _navigateHome();
-    } catch (e) {
-      setState(() => _errorMessage = e.toString());
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
-    }
-  }
-
-  Future<void> _googleSignIn() async {
-    setState(() {
-      _isLoading = true;
-      _errorMessage = null;
-    });
-    try {
-      final result = await _authService.signInWithGoogle();
-      if (result != null && mounted) _navigateHome();
-    } catch (e) {
-      setState(() => _errorMessage = e.toString());
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
-    }
-  }
-
-  Future<void> _forgotPassword() async {
-    if (_emailController.text.isEmpty) {
-      setState(() => _errorMessage = 'Enter your email first to reset password.');
-      return;
-    }
-    try {
-      await _authService.sendPasswordResetEmail(_emailController.text);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Password reset email sent! Check your inbox.')),
-        );
-      }
-    } catch (e) {
-      setState(() => _errorMessage = e.toString());
-    }
-  }
-
-  void _navigateHome() {
-    Navigator.of(context).pushReplacementNamed('/home');
-  }
+// ... (നിന്റെ സ്റ്റേറ്റ്ഫുൾ വിഡ്ജറ്റ് ക്ലാസ്സ് ഇവിടെ തുടങ്ങുന്നു)
 
   // ── Build ──────────────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.light,
-    ));
+    // ... (StatusBar സെറ്റിംഗ്സ്)
 
     return Scaffold(
       backgroundColor: _bg,
       body: FadeTransition(
         opacity: _fadeAnim,
         child: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 40),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildHeader(),
-                const SizedBox(height: 40),
-                _buildForm(),
-                const SizedBox(height: 16),
-                if (_errorMessage != null) _buildError(),
-                const SizedBox(height: 24),
-                _buildSubmitButton(),
-                const SizedBox(height: 20),
-                _buildDivider(),
-                const SizedBox(height: 20),
-                _buildGoogleButton(),
-                const SizedBox(height: 32),
-                _buildToggle(),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  // ── Widgets ────────────────────────────────────────────────────────────────
-
-  Widget _buildHeader() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Logo / brand mark
-        Container(
-          width: 52,
-          height: 52,
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [_accent, Color(0xFFBB86FC)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(14),
-            boxShadow: [
-              BoxShadow(
-                color: _accent.withOpacity(0.4),
-                blurRadius: 20,
-                offset: const Offset(0, 6),
+          child: Stack( // സ്റ്റാക്ക് ഉപയോഗിക്കുന്നത് ബാക്ക്ഗ്രൗണ്ടിൽ ബട്ടർഫ്ലൈ ആനിമേഷൻ വരാൻ സഹായിക്കും
+            children: [
+              SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 40),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildHeader(),
+                    const SizedBox(height: 40),
+                    _buildForm(),
+                    const SizedBox(height: 16),
+                    if (_errorMessage != null) _buildError(),
+                    const SizedBox(height: 24),
+                    _buildSubmitButton(),
+                    const SizedBox(height: 20),
+                    _buildDivider(),
+                    const SizedBox(height: 20),
+                    _buildGoogleButton(),
+                    const SizedBox(height: 12), // ഗൂഗിളിന് താഴെ വാലറ്റ് സെക്ഷൻ
+                    _buildWalletButton(), 
+                    const SizedBox(height: 32),
+                    _buildToggle(),
+                    const SizedBox(height: 40),
+                    _buildSignature(), // നിന്റെ സിഗ്നേച്ചർ
+                  ],
+                ),
               ),
+              _buildButterflyChatFAB(), // AI ചാറ്റ് ബട്ടൺ
             ],
           ),
-          child: const Center(
-            child: Text('E', style: TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold)),
-          ),
-        ),
-        const SizedBox(height: 28),
-        Text(
-          _isLogin ? 'Welcome back' : 'Create account',
-          style: const TextStyle(
-            color: _textPrimary,
-            fontSize: 30,
-            fontWeight: FontWeight.w700,
-            letterSpacing: -0.5,
-          ),
-        ),
-        const SizedBox(height: 6),
-        Text(
-          _isLogin
-              ? 'Sign in to continue to Emowall AI'
-              : 'Join the Emowall AI experience',
-          style: const TextStyle(color: _textSecondary, fontSize: 15),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildForm() {
-    return Form(
-      key: _formKey,
-      child: Column(
-        children: [
-          _buildTextField(
-            controller: _emailController,
-            label: 'Email',
-            hint: 'you@example.com',
-            icon: Icons.mail_outline_rounded,
-            keyboardType: TextInputType.emailAddress,
-            validator: (v) {
-              if (v == null || v.isEmpty) return 'Email is required';
-              if (!v.contains('@')) return 'Enter a valid email';
-              return null;
-            },
-          ),
-          const SizedBox(height: 16),
-          _buildTextField(
-            controller: _passwordController,
-            label: 'Password',
-            hint: '••••••••',
-            icon: Icons.lock_outline_rounded,
-            obscureText: _obscurePassword,
-            suffixIcon: IconButton(
-              icon: Icon(
-                _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                color: _textSecondary,
-                size: 20,
-              ),
-              onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
-            ),
-            validator: (v) {
-              if (v == null || v.isEmpty) return 'Password is required';
-              if (v.length < 6) return 'Minimum 6 characters';
-              return null;
-            },
-          ),
-          if (_isLogin) ...[
-            const SizedBox(height: 10),
-            Align(
-              alignment: Alignment.centerRight,
-              child: GestureDetector(
-                onTap: _forgotPassword,
-                child: const Text(
-                  'Forgot password?',
-                  style: TextStyle(color: _accentSoft, fontSize: 13),
-                ),
-              ),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String label,
-    required String hint,
-    required IconData icon,
-    TextInputType? keyboardType,
-    bool obscureText = false,
-    Widget? suffixIcon,
-    String? Function(String?)? validator,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label,
-            style: const TextStyle(color: _textSecondary, fontSize: 13, fontWeight: FontWeight.w500)),
-        const SizedBox(height: 8),
-        TextFormField(
-          controller: controller,
-          keyboardType: keyboardType,
-          obscureText: obscureText,
-          validator: validator,
-          style: const TextStyle(color: _textPrimary, fontSize: 15),
-          decoration: InputDecoration(
-            hintText: hint,
-            hintStyle: const TextStyle(color: Color(0xFF44445A)),
-            prefixIcon: Icon(icon, color: _textSecondary, size: 20),
-            suffixIcon: suffixIcon,
-            filled: true,
-            fillColor: _surface,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
-              borderSide: const BorderSide(color: _border),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
-              borderSide: const BorderSide(color: _border),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
-              borderSide: const BorderSide(color: _accent, width: 1.5),
-            ),
-            errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
-              borderSide: const BorderSide(color: Colors.redAccent),
-            ),
-            focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
-              borderSide: const BorderSide(color: Colors.redAccent, width: 1.5),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildError() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      decoration: BoxDecoration(
-        color: Colors.redAccent.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.redAccent.withOpacity(0.3)),
-      ),
-      child: Row(
-        children: [
-          const Icon(Icons.error_outline, color: Colors.redAccent, size: 18),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              _errorMessage!,
-              style: const TextStyle(color: Colors.redAccent, fontSize: 13),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSubmitButton() {
-    return SizedBox(
-      width: double.infinity,
-      height: 54,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [_accent, Color(0xFFBB86FC)],
-            begin: Alignment.centerLeft,
-            end: Alignment.centerRight,
-          ),
-          borderRadius: BorderRadius.circular(14),
-          boxShadow: [
-            BoxShadow(
-              color: _accent.withOpacity(0.35),
-              blurRadius: 16,
-              offset: const Offset(0, 6),
-            ),
-          ],
-        ),
-        child: ElevatedButton(
-          onPressed: _isLoading ? null : _submitEmailAuth,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.transparent,
-            shadowColor: Colors.transparent,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-          ),
-          child: _isLoading
-              ? const SizedBox(
-                  width: 22,
-                  height: 22,
-                  child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-                )
-              : Text(
-                  _isLogin ? 'Sign In' : 'Create Account',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 0.3,
-                  ),
-                ),
         ),
       ),
     );
   }
 
-  Widget _buildDivider() {
-    return Row(
-      children: [
-        const Expanded(child: Divider(color: _border)),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          child: Text('or continue with',
-              style: const TextStyle(color: _textSecondary, fontSize: 12)),
-        ),
-        const Expanded(child: Divider(color: _border)),
-      ],
-    );
-  }
-
-  Widget _buildGoogleButton() {
+  // ── പുതിയ വാലറ്റ് ബട്ടൺ ──────────────────────────────────────────────────────
+  Widget _buildWalletButton() {
     return SizedBox(
       width: double.infinity,
       height: 54,
       child: OutlinedButton.icon(
-        onPressed: _isLoading ? null : _googleSignIn,
-        icon: Image.network(
-          'https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg',
-          width: 20,
-          height: 20,
-          errorBuilder: (_, __, ___) =>
-              const Icon(Icons.g_mobiledata, color: Colors.white, size: 22),
-        ),
+        onPressed: () {
+          // ഇവിടുത്തെ ലോജിക്കിൽ നിന്റെ Alchemy/Reown വാലറ്റ് കണക്ട് ചെയ്യാം
+          print("Connecting to 540+ Wallets...");
+        },
+        icon: const Icon(Icons.account_balance_wallet_outlined, color: _accentSoft, size: 20),
         label: const Text(
-          'Continue with Google',
+          'Connect Wallet (540+)',
           style: TextStyle(color: _textPrimary, fontSize: 15, fontWeight: FontWeight.w500),
         ),
         style: OutlinedButton.styleFrom(
@@ -432,32 +74,29 @@ class _LoginPageState extends State<LoginPage>
     );
   }
 
-  Widget _buildToggle() {
-    return Center(
-      child: GestureDetector(
-        onTap: () {
-          setState(() {
-            _isLogin = !_isLogin;
-            _errorMessage = null;
-          });
-        },
-        child: RichText(
-          text: TextSpan(
-            text: _isLogin ? "Don't have an account? " : 'Already have an account? ',
-            style: const TextStyle(color: _textSecondary, fontSize: 14),
-            children: [
-              TextSpan(
-                text: _isLogin ? 'Sign Up' : 'Sign In',
-                style: const TextStyle(
-                  color: _accentSoft,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 14,
-                ),
-              ),
-            ],
-          ),
+  // ── Butterfly Chat FAB ────────────────────────────────────────────────────
+  Widget _buildButterflyChatFAB() {
+    return Positioned(
+      bottom: 20,
+      right: 20,
+      child: FloatingActionButton(
+        onPressed: () => print("Butterfly AI Chat Start"),
+        backgroundColor: _accent,
+        elevation: 10,
+        child: const Icon(Icons.butterfly_interactive, color: Colors.white, size: 30),
+      ),
+    );
+  }
+
+  // ── Signature (UX by. / ) ────────────────────────────────────────────────
+  Widget _buildSignature() {
+    return const Center(
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: 20),
+        child: Text(
+          'UX by. / Signature', // ഇവിടെ നിന്റെ ആ സിഗ്നേച്ചർ നൽകാം
+          style: TextStyle(color: _textSecondary, fontSize: 11, letterSpacing: 1.5),
         ),
       ),
     );
   }
-}
