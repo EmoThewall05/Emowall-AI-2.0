@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';  // ← fix this line
+import 'package:google_fonts/google_fonts.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:emowall/firebase_options.dart';
+import 'package:emowall/login_page.dart';
 import 'package:emowall/baby/digital_amma.dart';
 import 'package:emowall/child/child_doctor_ai.dart';
 import 'package:emowall/care/guardian_ai.dart';
@@ -8,8 +12,11 @@ import 'package:emowall/health/women_ai.dart';
 import 'package:emowall/widgets/butterfly_logo.dart';
 import 'package:emowall/screens/media_verifier_ai.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   runApp(const EmowallApp());
 }
@@ -26,7 +33,26 @@ class EmowallApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFFFF5500)),
         scaffoldBackgroundColor: const Color(0xFF07080B),
       ),
-      home: const ModeSelectionScreen(),
+      home: StreamBuilder<User?>(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (context, snapshot) {
+          // Waiting for Firebase to check auth state
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Scaffold(
+              backgroundColor: Color(0xFF07080B),
+              body: Center(
+                child: CircularProgressIndicator(color: Color(0xFFFF5500)),
+              ),
+            );
+          }
+          // User is logged in → go to home
+          if (snapshot.hasData) {
+            return const ModeSelectionScreen();
+          }
+          // Not logged in → show login
+          return const LoginPage();
+        },
+      ),
     );
   }
 }
@@ -72,7 +98,6 @@ class ModeSelectionScreen extends StatelessWidget {
               const SizedBox(height: 12),
               _modeCard(context, '♀️', "Women's Health", 'Gentle Health Companion', const Color(0xFFFF4F9A), const WomensHealthAIScreen()),
               const SizedBox(height: 24),
-              // ── NEW: AI TOOLS SECTION ──
               Text('🔍 AI Tools', style: GoogleFonts.syne(fontSize: 13, fontWeight: FontWeight.w700, color: const Color(0xFF8892A4))),
               const SizedBox(height: 12),
               GestureDetector(
