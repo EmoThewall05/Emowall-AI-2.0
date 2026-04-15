@@ -38,3 +38,5 @@ yarn-error.log*
 .idea/
 .npm/
 .npm/
+node_modules/
+.env
