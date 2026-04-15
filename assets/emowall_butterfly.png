@@ -1,0 +1,262 @@
+import 'dart:async';
+import 'dart:math';
+import 'package:flutter/material.dart';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:provider/provider.dart';
+import '../controllers/butterfly_controller.dart';
+
+class TheWallButterfly extends StatefulWidget {
+  const TheWallButterfly({super.key});
+
+  @override
+  State<TheWallButterfly> createState() => _TheWallButterflyState();
+}
+
+class _TheWallButterflyState extends State<TheWallButterfly>
+    with TickerProviderStateMixin {
+  final AudioPlayer _player = AudioPlayer();
+  final Random _rand = Random();
+
+  // Float up/down while flying
+  late AnimationController _floatController;
+  late Animation<double> _floatY;
+
+  // Glow pulse
+  late AnimationController _glowController;
+  late Animation<double> _glowOpacity;
+
+  // Wing flap (scale X) while flying
+  late AnimationController _flapController;
+  late Animation<double> _flapScale;
+
+  // Spin on takeoff
+  late AnimationController _spinController;
+  late Animation<double> _spinAngle;
+
+  // Gentle sway while sitting on flower
+  late AnimationController _sitController;
+  late Animation<double> _sitSway;
+
+  Offset _position = const Offset(200, 200);
+  bool _isLanded = false;
+  bool _isTakingOff = false;
+  Timer? _moveTimer;
+  Timer? _landTimer;
+
+  // Flower position â€” passed from parent or fixed
+  Offset _flowerPosition = const Offset(120, 400);
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Float
+    _floatController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2000),
+    )..repeat(reverse: true);
+
+    _floatY = Tween<double>(begin: -12, end: 12).animate(
+      CurvedAnimation(parent: _floatController, curve: Curves.easeInOut),
+    );
+
+    // Glow
+    _glowController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    )..repeat(reverse: true);
+
+    _glowOpacity = Tween<double>(begin: 0.4, end: 0.9).animate(_glowController);
+
+    // Wing flap
+    _flapController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    )..repeat(reverse: true);
+
+    _flapScale = Tween<double>(begin: 0.7, end: 1.0).animate(
+      CurvedAnimation(parent: _flapController, curve: Curves.easeInOut),
+    );
+
+    // Spin (takeoff)
+    _spinController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 700),
+    );
+
+    _spinAngle = Tween<double>(begin: 0, end: 2 * pi).animate(
+      CurvedAnimation(parent: _spinController, curve: Curves.easeInOut),
+    );
+
+    // Sit sway on flower
+    _sitController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1800),
+    )..repeat(reverse: true);
+
+    _sitSway = Tween<double>(begin: -0.08, end: 0.08).animate(
+      CurvedAnimation(parent: _sitController, curve: Curves.easeInOut),
+    );
+
+    _startAutoFlight();
+  }
+
+  void _startAutoFlight() {
+    _moveTimer = Timer.periodic(const Duration(seconds: 10), (_) {
+      if (!_isLanded && !_isTakingOff) {
+        // 40% chance to land on flower, else fly to random spot
+        if (_rand.nextDouble() < 0.4) {
+          _landOnFlower();
+        } else {
+          _flyToNewSpot();
+        }
+      }
+    });
+  }
+
+  void _flyToNewSpot() async {
+    final size = MediaQuery.of(context).size;
+    await _player.play(AssetSource('sounds/wing.wav'));
+
+    setState(() {
+      _position = Offset(
+        _rand.nextDouble() * (size.width - 150),
+        _rand.nextDouble() * (size.height - 300),
+      );
+    });
+  }
+
+  void _landOnFlower() async {
+    // Fly to flower position (slightly above center of flower)
+    setState(() {
+      _position = Offset(
+        _flowerPosition.dx - 10,
+        _flowerPosition.dy - 60,
+      );
+    });
+
+    // Wait for AnimatedPositioned to finish moving
+    await Future.delayed(const Duration(milliseconds: 1300));
+
+    if (!mounted) return;
+
+    setState(() {
+      _isLanded = true;
+    });
+
+    // Stop float, stop flap while sitting
+    _floatController.stop();
+    _flapController.stop();
+
+    // Sit for 4â€“8 seconds then take off
+    final sitDuration = 4000 + _rand.nextInt(4000);
+    _landTimer = Timer(Duration(milliseconds: sitDuration), () {
+      if (mounted) _takeOff();
+    });
+  }
+
+  void _takeOff() async {
+    if (!mounted) return;
+
+    setState(() {
+      _isTakingOff = true;
+      _isLanded = false;
+    });
+
+    // Spin animation on takeoff
+    _spinController.forward(from: 0);
+    await Future.delayed(const Duration(milliseconds: 400));
+
+    // Resume float and flap
+    _floatController.repeat(reverse: true);
+    _flapController.repeat(reverse: true);
+
+    await _player.play(AssetSource('sounds/wing.wav'));
+
+    setState(() {
+      _isTakingOff = false;
+    });
+
+    // Fly to new random spot
+    _flyToNewSpot();
+  }
+
+  @override
+  void dispose() {
+    _moveTimer?.cancel();
+    _landTimer?.cancel();
+    _floatController.dispose();
+    _glowController.dispose();
+    _flapController.dispose();
+    _spinController.dispose();
+    _sitController.dispose();
+    _player.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final state = context.watch<ButterflyState>();
+
+    return AnimatedPositioned(
+      duration: const Duration(milliseconds: 1200),
+      curve: Curves.fastOutSlowIn,
+      left: _position.dx,
+      top: _position.dy,
+      child: AnimatedBuilder(
+        animation: Listenable.merge([
+          _floatController,
+          _glowController,
+          _flapController,
+          _spinController,
+          _sitController,
+        ]),
+        builder: (context, child) {
+          // While sitting: gentle sway rotation
+          // While taking off: full spin
+          // While flying: no rotation
+          double rotation = 0;
+          if (_isLanded) {
+            rotation = _sitSway.value;
+          } else if (_isTakingOff) {
+            rotation = _spinAngle.value;
+          }
+
+          // Float offset only while flying
+          double floatOffset = _isLanded ? 0 : _floatY.value;
+
+          // Wing flap scale only while flying
+          double wingScale = _isLanded ? 1.0 : _flapScale.value;
+
+          return Transform.translate(
+            offset: Offset(0, floatOffset),
+            child: Transform.rotate(
+              angle: rotation,
+              child: Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: state.glowColor.withOpacity(_glowOpacity.value),
+                      blurRadius: _isLanded ? 50 : 35,
+                      spreadRadius: _isLanded ? 10 : 5,
+                    ),
+                  ],
+                ),
+                child: Transform(
+                  alignment: Alignment.center,
+                  transform: Matrix4.identity()..scale(wingScale, 1.0),
+                  child: Image.asset(
+                    'assets/thewall_butterfly.png',
+                    width: 140,
+                    height: 140,
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
