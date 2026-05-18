@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:emowall/firebase_options.dart';
+
 import 'package:emowall/login_page.dart';
 import 'package:emowall/baby/digital_amma.dart';
 import 'package:emowall/child/child_doctor_ai.dart';
@@ -17,7 +17,7 @@ import 'package:emowall/screens/guardian_mode.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
+
   );
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   runApp(const EmowallApp());
