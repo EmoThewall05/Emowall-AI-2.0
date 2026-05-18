@@ -11,6 +11,7 @@ import 'package:emowall/care/guardian_ai.dart';
 import 'package:emowall/health/women_ai.dart';
 import 'package:emowall/widgets/butterfly_logo.dart';
 import 'package:emowall/screens/media_verifier_ai.dart';
+import 'package:emowall/screens/shield_mode.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -378,97 +379,6 @@ class _GuardianModeScreenState extends State<GuardianModeScreen> {
 }
 
 // ==================== SHIELD MODE ====================
-class ShieldModeScreen extends StatefulWidget {
-  const ShieldModeScreen({super.key});
-  @override
-  State<ShieldModeScreen> createState() => _ShieldModeScreenState();
-}
-
-class _ShieldModeScreenState extends State<ShieldModeScreen> {
-  bool _raggingDetect = false;
-  bool _fallDetect = false;
-  bool _accidentDetect = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF07080B),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF0C0F14),
-        title: Text('⚔️ Shield Mode', style: GoogleFonts.syne(fontWeight: FontWeight.w800, color: Colors.white)),
-        iconTheme: const IconThemeData(color: Colors.white),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(children: [
-          ElevatedButton.icon(
-            onPressed: _quickSOS,
-            icon: const Icon(Icons.sos, size: 28),
-            label: Text('EMERGENCY SOS', style: GoogleFonts.syne(fontSize: 16, fontWeight: FontWeight.w800)),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFEF4444),
-              foregroundColor: Colors.white,
-              minimumSize: const Size(double.infinity, 60),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            ),
-          ),
-          const SizedBox(height: 24),
-          _featureToggle('🎓 Ragging Detection', 'Auto detect aggressive voices + record evidence', _raggingDetect, (v) => setState(() => _raggingDetect = v), const Color(0xFFFBBF24)),
-          const SizedBox(height: 12),
-          _featureToggle('👴 Fall Detection', 'Alert if elderly person falls', _fallDetect, (v) => setState(() => _fallDetect = v), const Color(0xFF3B82F6)),
-          const SizedBox(height: 12),
-          _featureToggle('🚗 Accident Detection', 'Detect sudden impact', _accidentDetect, (v) => setState(() => _accidentDetect = v), const Color(0xFF00E676)),
-          const SizedBox(height: 24),
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(color: const Color(0xFF111519), border: Border.all(color: const Color(0xFFFBBF24).withOpacity(0.3)), borderRadius: BorderRadius.circular(12)),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('📹 Evidence Recorder', style: GoogleFonts.syne(fontWeight: FontWeight.w700, color: Colors.white)),
-              Text('Auto records audio/video when threat detected', style: GoogleFonts.jetBrainsMono(fontSize: 10, color: const Color(0xFF8892A4))),
-              const SizedBox(height: 12),
-              Row(children: [
-                Expanded(child: OutlinedButton.icon(
-                  onPressed: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('🎤 Recording audio...'), backgroundColor: Color(0xFFFBBF24))),
-                  icon: const Icon(Icons.mic, color: Color(0xFFFBBF24)),
-                  label: const Text('Record Audio', style: TextStyle(color: Color(0xFFFBBF24))),
-                  style: OutlinedButton.styleFrom(side: const BorderSide(color: Color(0xFFFBBF24))),
-                )),
-                const SizedBox(width: 8),
-                Expanded(child: OutlinedButton.icon(
-                  onPressed: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('📹 Recording video...'), backgroundColor: Color(0xFFFBBF24))),
-                  icon: const Icon(Icons.videocam, color: Color(0xFFFBBF24)),
-                  label: const Text('Record Video', style: TextStyle(color: Color(0xFFFBBF24))),
-                  style: OutlinedButton.styleFrom(side: const BorderSide(color: Color(0xFFFBBF24))),
-                )),
-              ]),
-            ]),
-          ),
-        ]),
-      ),
-    );
-  }
-
-  void _quickSOS() {
-    HapticFeedback.heavyImpact();
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('🚨 SOS sent! Location shared with emergency contacts'), backgroundColor: Color(0xFFEF4444)));
-  }
-
-  Widget _featureToggle(String title, String subtitle, bool value, Function(bool) onChanged, Color color) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: const Color(0xFF111519), border: Border.all(color: color.withOpacity(0.2)), borderRadius: BorderRadius.circular(12)),
-      child: Row(children: [
-        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(title, style: GoogleFonts.syne(fontWeight: FontWeight.w700, color: Colors.white)),
-          Text(subtitle, style: GoogleFonts.jetBrainsMono(fontSize: 10, color: const Color(0xFF8892A4))),
-        ])),
-        Switch(value: value, onChanged: onChanged, activeColor: color),
-      ]),
-    );
-  }
-}
-
-// ==================== CARE MODE ====================
 class CareModeScreen extends StatefulWidget {
   const CareModeScreen({super.key});
   @override
