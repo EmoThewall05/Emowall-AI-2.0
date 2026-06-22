@@ -13,12 +13,11 @@ import 'package:emowall/widgets/butterfly_logo.dart';
 import 'package:emowall/screens/media_verifier_ai.dart';
 import 'package:emowall/screens/shield_mode.dart';
 import 'package:emowall/screens/guardian_mode.dart';
+import 'package:emowall/animal/animal_alert_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-
-  );
+  await Firebase.initializeApp();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   runApp(const EmowallApp());
 }
@@ -38,7 +37,6 @@ class EmowallApp extends StatelessWidget {
       home: StreamBuilder<User?>(
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {
-          // Waiting for Firebase to check auth state
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Scaffold(
               backgroundColor: Color(0xFF07080B),
@@ -47,11 +45,9 @@ class EmowallApp extends StatelessWidget {
               ),
             );
           }
-          // User is logged in → go to home
           if (snapshot.hasData) {
             return const ModeSelectionScreen();
           }
-          // Not logged in → show login
           return const LoginPage();
         },
       ),
@@ -80,6 +76,7 @@ class ModeSelectionScreen extends StatelessWidget {
               const SizedBox(height: 8),
               Text('AI 2.0', style: GoogleFonts.jetBrainsMono(fontSize: 11, color: const Color(0xFF00E676))),
               const SizedBox(height: 32),
+
               Text('🛡️ Safety', style: GoogleFonts.syne(fontSize: 13, fontWeight: FontWeight.w700, color: const Color(0xFF8892A4))),
               const SizedBox(height: 12),
               _modeCard(context, '🛡️', 'Guardian Mode', 'Children & Women Safety', const Color(0xFF3B82F6), const GuardianModeScreen()),
@@ -90,16 +87,24 @@ class ModeSelectionScreen extends StatelessWidget {
               const SizedBox(height: 12),
               _modeCard(context, '🛡️🗣️', 'Guardian AI', 'Voice-activated Elder Care', const Color(0xFF00E5FF), const GuardianAIScreen()),
               const SizedBox(height: 24),
+
               Text('👶 Child & Family', style: GoogleFonts.syne(fontSize: 13, fontWeight: FontWeight.w700, color: const Color(0xFF8892A4))),
               const SizedBox(height: 12),
               _modeCard(context, '👩‍👶', 'Digital Amma', 'Baby Care & Lullabies AI', const Color(0xFFFF4F9A), const DigitalAmmaScreen()),
               const SizedBox(height: 12),
               _modeCard(context, '👨‍⚕️', 'Child Doctor AI', 'Child Mental Health & Therapy', const Color(0xFFFFBF24), const ChildDoctorAI()),
               const SizedBox(height: 24),
+
               Text('💜 Health', style: GoogleFonts.syne(fontSize: 13, fontWeight: FontWeight.w700, color: const Color(0xFF8892A4))),
               const SizedBox(height: 12),
               _modeCard(context, '♀️', "Women's Health", 'Gentle Health Companion', const Color(0xFFFF4F9A), const WomensHealthAIScreen()),
               const SizedBox(height: 24),
+
+              Text('🐾 Nature Safety', style: GoogleFonts.syne(fontSize: 13, fontWeight: FontWeight.w700, color: const Color(0xFF8892A4))),
+              const SizedBox(height: 12),
+              _modeCard(context, '🐾', 'Animal Alert', 'Snake, Dog & Insect Detection', const Color(0xFFFF8C00), const AnimalAlertScreen()),
+              const SizedBox(height: 24),
+
               Text('🔍 AI Tools', style: GoogleFonts.syne(fontSize: 13, fontWeight: FontWeight.w700, color: const Color(0xFF8892A4))),
               const SizedBox(height: 12),
               GestureDetector(
@@ -196,7 +201,7 @@ class ModeSelectionScreen extends StatelessWidget {
   }
 }
 
-// ==================== GUARDIAN MODE ====================
+// ==================== CARE MODE ====================
 class CareModeScreen extends StatefulWidget {
   const CareModeScreen({super.key});
   @override
