@@ -16,7 +16,7 @@ class AnimalAlertScreen extends StatefulWidget {
 class _AnimalAlertScreenState extends State<AnimalAlertScreen> {
   static const String _workerUrl =
       'https://emowall-animal-alert.meradivin.workers.dev';
-  static const String _emoKey = 'YOUR_EMO_KEY_HERE';
+  static const String _emoKey = 'emo_75bb11d8d603c836f5768adb';
 
   CameraController? _cameraController;
   List<CameraDescription> _cameras = [];
