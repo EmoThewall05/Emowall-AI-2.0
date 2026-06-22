@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'guardian_ai.dart';
 import 'emotion_detector.dart';
 
-class GuardianChatScreen extends StatefulWidget {
+class ButterflyGuardianScreen extends StatefulWidget {
   @override
-  _GuardianChatScreenState createState() => _GuardianChatScreenState();
+  ButterflyGuardianScreenState createState() => ButterflyGuardianScreenState();
 }
 
-class _GuardianChatScreenState extends State<GuardianChatScreen> {
+class ButterflyGuardianScreenState extends State<ButterflyGuardianScreen> {
   List<Map<String, dynamic>> messages = [];
   TextEditingController controller = TextEditingController();
   ScrollController scrollController = ScrollController();
