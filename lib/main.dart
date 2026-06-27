@@ -56,8 +56,106 @@ class EmowallApp extends StatelessWidget {
 }
 
 // ==================== MODE SELECTION ====================
-class ModeSelectionScreen extends StatelessWidget {
+class ModeSelectionScreen extends StatefulWidget {
   const ModeSelectionScreen({super.key});
+  @override
+  State<ModeSelectionScreen> createState() => _ModeSelectionScreenState();
+}
+
+class _ModeSelectionScreenState extends State<ModeSelectionScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _showPermissionDialog();
+    });
+  }
+
+  void _showPermissionDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Dialog(
+        backgroundColor: const Color(0xFF0D1117),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('🦋', style: TextStyle(fontSize: 40)),
+              const SizedBox(height: 12),
+              Text('Your Safety, Our Responsibility',
+                style: GoogleFonts.syne(fontSize: 18, fontWeight: FontWeight.w800, color: Colors.white),
+                textAlign: TextAlign.center),
+              const SizedBox(height: 16),
+              Text('Emowall requests the following permissions to protect you silently:',
+                style: GoogleFonts.jetBrainsMono(fontSize: 11, color: const Color(0xFF8892A4)),
+                textAlign: TextAlign.center),
+              const SizedBox(height: 16),
+              _permRow('📍', 'Location', 'Detect unsafe zones & send live location during SOS'),
+              _permRow('🎤', 'Microphone', 'Detect danger sounds, crying & bad words silently'),
+              _permRow('📷', 'Camera', 'Animal Alert — identify dangerous creatures via AI scan'),
+              _permRow('⌚', 'Body Sensors', 'Heart rate & fall detection via smartwatch or phone'),
+              _permRow('📞', 'Phone & SMS', 'Auto SOS call & alert to emergency contacts only'),
+              _permRow('🔔', 'Notifications', 'Silent SOS alerts to parents & guardians'),
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF001A0D),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: const Color(0xFF00E676), width: 1),
+                ),
+                child: Text(
+                  '🔐 We never collect, store or share your personal data. No name. No number. No history. Your privacy is sacred.',
+                  style: GoogleFonts.jetBrainsMono(fontSize: 10, color: const Color(0xFF00E676)),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF00E676),
+                    foregroundColor: Colors.black,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                  ),
+                  child: Text('I Understand — Protect Me', style: GoogleFonts.syne(fontWeight: FontWeight.w700)),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _permRow(String emoji, String title, String desc) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(emoji, style: const TextStyle(fontSize: 16)),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: GoogleFonts.syne(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.white)),
+                Text(desc, style: GoogleFonts.jetBrainsMono(fontSize: 10, color: const Color(0xFF8892A4))),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
