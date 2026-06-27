@@ -1,7 +1,7 @@
 name: emowall
 description: "Emowall AI 2.0 - The Living Fortress AI Guardian"
 publish_to: 'none'
-version: 2.0.2+3
+version: 2.0.2+4
 
 environment:
   sdk: '>=3.6.0 <4.0.0'
