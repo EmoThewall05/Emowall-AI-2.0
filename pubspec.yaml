@@ -1,7 +1,7 @@
 name: emowall
 description: "Emowall AI 2.0 - The Living Fortress AI Guardian"
 publish_to: 'none'
-version: 2.0.2+4
+version: 2.0.2+5
 
 environment:
   sdk: '>=3.6.0 <4.0.0'
@@ -21,7 +21,7 @@ dependencies:
   flutter_local_notifications: ^18.0.1
   audioplayers: ^5.2.1
   image_picker: ^1.1.2
-  health: ^10.2.0
+  health: ^13.3.1
   flutter_blue_plus: ^1.31.15
   permission_handler: ^11.3.1
   camera: ^0.11.0+2
