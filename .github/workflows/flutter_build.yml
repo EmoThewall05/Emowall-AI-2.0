@@ -1,0 +1,44 @@
+name: Flutter Build & Release
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.27.0'
+        channel: 'stable'
+    
+    - name: Install dependencies
+      run: flutter pub get
+    
+    - name: Run analyzer
+      run: flutter analyze
+    
+    - name: Build APK
+      run: flutter build apk --release
+    
+    - name: Build AAB (for Play Store)
+      run: flutter build appbundle --release
+    
+    - name: Upload APK artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: emowall-app-release.apk
+        path: build/app/outputs/flutter-app.apk
+    
+    - name: Upload AAB artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: emowall-app-release.aab
+        path: build/app/outputs/bundle/release/app-release.aab
