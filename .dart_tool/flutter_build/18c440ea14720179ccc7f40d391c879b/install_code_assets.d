@@ -1,0 +1,1 @@
+ /data/data/com.termux/files/home/Emowall-AI-2.0/.dart_tool/flutter_build/18c440ea14720179ccc7f40d391c879b/native_assets.json: 

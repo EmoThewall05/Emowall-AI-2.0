@@ -1,0 +1,69 @@
+[1mdiff --git a/android/app/build.gradle.kts b/android/app/build.gradle.kts[m
+[1mdeleted file mode 100644[m
+[1mindex e51df1d..0000000[m
+[1m--- a/android/app/build.gradle.kts[m
+[1m+++ /dev/null[m
+[36m@@ -1,52 +0,0 @@[m
+[31m-plugins {[m
+[31m-    id("com.android.application")[m
+[31m-    id("kotlin-android")[m
+[31m-    id("dev.flutter.flutter-gradle-plugin")[m
+[31m-}[m
+[31m-[m
+[31m-android {[m
+[31m-    namespace = "com.emobies.emowall"[m
+[31m-    compileSdk = 36[m
+[31m-    ndkVersion = "27.0.12077973"[m
+[31m-[m
+[31m-    compileOptions {[m
+[31m-        sourceCompatibility = JavaVersion.VERSION_17[m
+[31m-        targetCompatibility = JavaVersion.VERSION_17[m
+[31m-        isCoreLibraryDesugaringEnabled = true[m
+[31m-    }[m
+[31m-[m
+[31m-    kotlinOptions {[m
+[31m-        jvmTarget = JavaVersion.VERSION_17.toString()[m
+[31m-    }[m
+[31m-[m
+[31m-    defaultConfig {[m
+[31m-        applicationId = "com.emobies.emowall"[m
+[31m-        minSdk = 24[m
+[31m-        targetSdk = flutter.targetSdkVersion[m
+[31m-        versionCode = flutter.versionCode[m
+[31m-        versionName = flutter.versionName[m
+[31m-    }[m
+[31m-[m
+[31m-    signingConfigs {[m
+[31m-        create("release") {[m
+[31m-            storeFile = file(System.getenv("STORE_FILE") ?: "release.keystore")[m
+[31m-            storePassword = System.getenv("STORE_PASSWORD") ?: ""[m
+[31m-            keyAlias = System.getenv("KEY_ALIAS") ?: ""[m
+[31m-            keyPassword = System.getenv("KEY_PASSWORD") ?: ""[m
+[31m-        }[m
+[31m-    }[m
+[31m-[m
+[31m-    buildTypes {[m
+[31m-        release {[m
+[31m-            signingConfig = signingConfigs.getByName("release")[m
+[31m-        }[m
+[31m-    }[m
+[31m-}[m
+[31m-[m
+[31m-flutter {[m
+[31m-    source = "../.."[m
+[31m-}[m
+[31m-[m
+[31m-dependencies {[m
+[31m-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")[m
+[31m-}[m
+[1mdiff --git a/android/gradle.properties b/android/gradle.properties[m
+[1mindex fbee1d8..d5da727 100644[m
+[1m--- a/android/gradle.properties[m
+[1m+++ b/android/gradle.properties[m
+[36m@@ -1,2 +1,6 @@[m
+ org.gradle.jvmargs=-Xmx8G -XX:MaxMetaspaceSize=4G -XX:ReservedCodeCacheSize=512m -XX:+HeapDumpOnOutOfMemoryError[m
+ android.useAndroidX=true[m
+[32m+[m[32m# This builtInKotlin flag was added automatically by Flutter migrator[m
+[32m+[m[32mandroid.builtInKotlin=false[m
+[32m+[m[32m# This newDsl flag was added automatically by Flutter migrator[m
+[32m+[m[32mandroid.newDsl=false[m

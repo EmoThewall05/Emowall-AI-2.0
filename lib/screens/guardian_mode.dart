@@ -6,6 +6,9 @@ import '../services/sound_detection_service.dart';
 import '../services/verification_chain_service.dart';
 import '../services/location_service.dart';
 import '../services/alert_service.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'emergency_contacts_screen.dart';
 
 class GuardianModeScreen extends StatefulWidget {
   const GuardianModeScreen({super.key});
@@ -28,16 +31,37 @@ class _GuardianModeScreenState extends State<GuardianModeScreen> {
   int _sosCountdown = 10;
   Timer? _sosTimer;
 
-  final List<Map<String, String>> _contacts = [
-    {'name': 'Parent/Guardian', 'phone': '+91XXXXXXXXXX'},
-    {'name': 'Relative', 'phone': '+91XXXXXXXXXX'},
-    {'name': 'School Principal', 'phone': '+91XXXXXXXXXX'},
-  ];
+  List<Map<String, String>> _contacts = [];
 
   @override
   void initState() {
     super.initState();
     _soundService.initialize();
+    _loadContactsFromSupabase();
+  }
+
+  Future<void> _loadContactsFromSupabase() async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return;
+    try {
+      final data = await Supabase.instance.client
+          .from('emergency_contacts')
+          .select('name, phone')
+          .eq('firebase_uid', uid);
+      final fetched = List<Map<String, dynamic>>.from(data);
+      if (fetched.isNotEmpty && mounted) {
+        setState(() {
+          _contacts = fetched
+              .map((c) => {
+                    'name': (c['name'] ?? '').toString(),
+                    'phone': (c['phone'] ?? '').toString(),
+                  })
+              .toList();
+        });
+      }
+    } catch (e) {
+      // Keep _contacts empty on failure
+    }
   }
 
   // 🟢 Activate full protection
@@ -373,7 +397,23 @@ class _GuardianModeScreenState extends State<GuardianModeScreen> {
               _alertChannel('✈️ Telegram', true),
               _alertChannel('🎮 Discord', true),
               _alertChannel('🚔 Kerala Police', true),
+              _alertChannel('📩 SMS', true),
               _alertChannel('📍 Live GPS', true),
+              const SizedBox(height: 12),
+              ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const EmergencyContactsScreen()),
+                  );
+                },
+                icon: const Icon(Icons.contacts),
+                label: const Text('Manage Emergency Contacts'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF3B82F6),
+                  minimumSize: const Size(double.infinity, 44),
+                ),
+              ),
             ]),
           ),
         ]),
