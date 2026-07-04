@@ -25,7 +25,7 @@ jobs:
 
       - name: Patch telephony package manifest (AGP namespace fix)
         run: |
-          sed -i '/package="com.shounakmulay.telephony"/d' $HOME/.pub-cache/hosted/pub.dev/telephony-0.2.0/android/src/main/AndroidManifest.xml
+          sed -i 's/ package="com.shounakmulay.telephony"//' $HOME/.pub-cache/hosted/pub.dev/telephony-0.2.0/android/src/main/AndroidManifest.xml
 
       - name: Decode Keystore
         run: |
