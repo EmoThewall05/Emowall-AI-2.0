@@ -23,6 +23,10 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Patch telephony package manifest (AGP namespace fix)
+        run: |
+          sed -i '/package="com.shounakmulay.telephony"/d' $HOME/.pub-cache/hosted/pub.dev/telephony-0.2.0/android/src/main/AndroidManifest.xml
+
       - name: Decode Keystore
         run: |
           echo "${{ secrets.KEYSTORE_BASE64 }}" | tr -d '\n' | base64 --decode > android/app/upload-keystore.p12
