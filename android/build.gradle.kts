@@ -15,10 +15,9 @@ subprojects {
     val newSubprojectBuildDir: Directory = newBuildDir.dir(project.name)
     project.layout.buildDirectory.value(newSubprojectBuildDir)
 }
-subprojects {
-    project.evaluationDependsOn(":app")
-}
 
+// Fix for outdated plugins (e.g. telephony) missing AGP namespace declaration
+// NOTE: must run BEFORE evaluationDependsOn forces early evaluation
 subprojects {
     afterEvaluate {
         extensions.findByType(com.android.build.gradle.BaseExtension::class.java)?.let { android ->
@@ -27,6 +26,10 @@ subprojects {
             }
         }
     }
+}
+
+subprojects {
+    project.evaluationDependsOn(":app")
 }
 
 tasks.register<Delete>("clean") {
