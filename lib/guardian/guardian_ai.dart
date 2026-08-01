@@ -5,7 +5,7 @@ import 'emotion_detector.dart';
 class ButterflyGuardian {
   static const String _workerUrl =
       'https://emowall-guardian-ai.meradivin.workers.dev';
-  static const String _emoKey = 'emo_75bb11d8d603c836f5768adb; // replace with actual key
+  static const String _emoKey = 'emo_75bb11d8d603c836f5768adb'; // replace with actual key
 
   static Future<String> getResponse(String userText, String emotion) async {
     if (emotion == 'hurt' || emotion == 'angry' || emotion == 'sad') {
