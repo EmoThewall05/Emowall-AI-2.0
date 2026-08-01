@@ -11,9 +11,9 @@ import 'package:emowall/child/child_doctor_ai.dart';
 import 'package:emowall/care/guardian_ai.dart';
 import 'package:emowall/health/women_ai.dart';
 import 'package:emowall/widgets/butterfly_logo.dart';
-import 'package:emowall/screens/media_verifier_ai.dart';
-import 'package:emowall/screens/shield_mode.dart';
-import 'package:emowall/screens/kidnap_mode.dart';
+import 'package:emowall/media_verifier_ai.dart';
+import 'package:emowall/shield_mode.dart';
+import 'package:emowall/kidnap_mode.dart';
 import 'package:emowall/animal/animal_alert_screen.dart';
 
 void main() async {

@@ -8,7 +8,7 @@ import '../services/location_service.dart';
 import '../services/alert_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'emergency_contacts_screen.dart';
+import 'screens/emergency_contacts_screen.dart';
 
 class KidnapModeScreen extends StatefulWidget {
   const KidnapModeScreen({super.key});
