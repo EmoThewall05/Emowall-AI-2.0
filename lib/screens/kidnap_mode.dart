@@ -10,13 +10,13 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'emergency_contacts_screen.dart';
 
-class GuardianModeScreen extends StatefulWidget {
-  const GuardianModeScreen({super.key});
+class KidnapModeScreen extends StatefulWidget {
+  const KidnapModeScreen({super.key});
   @override
-  State<GuardianModeScreen> createState() => _GuardianModeScreenState();
+  State<KidnapModeScreen> createState() => _KidnapModeScreenState();
 }
 
-class _GuardianModeScreenState extends State<GuardianModeScreen> {
+class _KidnapModeScreenState extends State<KidnapModeScreen> {
   final SoundDetectionService _soundService = SoundDetectionService();
   final VerificationChainService _chainService = VerificationChainService();
   final LocationService _locationService = LocationService();
@@ -26,7 +26,7 @@ class _GuardianModeScreenState extends State<GuardianModeScreen> {
   bool _soundDetectOn = false;
   bool _isEmergency = false;
   bool _chainActive = false;
-  String _status = '🛡️ Guardian Mode Ready';
+  String _status = '🛡️ Kidnap Mode Ready';
   String _chainStatus = '';
   int _sosCountdown = 10;
   Timer? _sosTimer;
@@ -76,7 +76,7 @@ class _GuardianModeScreenState extends State<GuardianModeScreen> {
 
     // Notify via Telegram + Discord
     await _alertService.sendInfoAlert(
-      '🟢 Emowall Guardian Mode ACTIVATED\n'
+      '🟢 Emowall Kidnap Mode ACTIVATED\n'
       'Silent monitoring started.\n'
       'Child is protected. 🛡️',
     );
@@ -88,7 +88,7 @@ class _GuardianModeScreenState extends State<GuardianModeScreen> {
     setState(() {
       _isActive = false;
       _soundDetectOn = false;
-      _status = '🛡️ Guardian Mode Ready';
+      _status = '🛡️ Kidnap Mode Ready';
     });
   }
 
@@ -212,7 +212,7 @@ class _GuardianModeScreenState extends State<GuardianModeScreen> {
           : const Color(0xFF07080B),
       appBar: AppBar(
         backgroundColor: const Color(0xFF0C0F14),
-        title: Text('🛡️ Guardian Mode',
+        title: Text('🛡️ Kidnap Mode',
             style: GoogleFonts.syne(
                 fontWeight: FontWeight.w800, color: Colors.white)),
         iconTheme: const IconThemeData(color: Colors.white),

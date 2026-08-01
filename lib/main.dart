@@ -13,7 +13,7 @@ import 'package:emowall/health/women_ai.dart';
 import 'package:emowall/widgets/butterfly_logo.dart';
 import 'package:emowall/screens/media_verifier_ai.dart';
 import 'package:emowall/screens/shield_mode.dart';
-import 'package:emowall/screens/guardian_mode.dart';
+import 'package:emowall/screens/kidnap_mode.dart';
 import 'package:emowall/animal/animal_alert_screen.dart';
 
 void main() async {
@@ -182,7 +182,7 @@ class _ModeSelectionScreenState extends State<ModeSelectionScreen> {
 
               Text('🛡️ Safety', style: GoogleFonts.syne(fontSize: 13, fontWeight: FontWeight.w700, color: const Color(0xFF8892A4))),
               const SizedBox(height: 12),
-              _modeCard(context, '🛡️', 'Guardian Mode', 'Children & Women Safety', const Color(0xFF3B82F6), const GuardianModeScreen()),
+              _modeCard(context, '🛡️', 'Kidnap Mode', 'Children & Women Safety', const Color(0xFF3B82F6), const KidnapModeScreen()),
               const SizedBox(height: 12),
               _modeCard(context, '⚔️', 'Shield Mode', 'Men, Elderly & College Safety', const Color(0xFF00E676), const ShieldModeScreen()),
               const SizedBox(height: 12),
