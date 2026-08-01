@@ -24,7 +24,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
   late AnimationController _glowController;
   late Animation<double> _glowAnimation;
 
-  // â”€â”€ Colors â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Colors ────────────────────────────────────────────────
   static const _bg       = Color(0xFF07080B);
   static const _surface  = Color(0xFF111519);
   static const _accent   = Color(0xFFFF5500);
@@ -53,7 +53,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  // â”€â”€ Auth Actions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Auth Actions ───────────────────────────────────────────
   Future<void> _submitEmailAuth() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() { _isLoading = true; _errorMessage = null; });
@@ -90,7 +90,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
     }
   }
 
-  // â”€â”€ Build â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Build ──────────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -102,7 +102,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
             children: [
               const SizedBox(height: 20),
 
-              // ðŸ¦‹ Animated Butterfly Logo with glow
+              // 🦋 Animated Butterfly Logo with glow
               AnimatedBuilder(
                 animation: _glowAnimation,
                 builder: (context, child) {
@@ -157,7 +157,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
 
               // Footer
               Text(
-                "BUILT ON MOBILE â€¢ DXB ðŸ‡¦ðŸ‡ª IND ðŸ‡®ðŸ‡³",
+                "BUILT ON MOBILE • DXB 🇦🇪 IND 🇮🇳",
                 style: GoogleFonts.jetBrainsMono(
                   fontSize: 9,
                   color: Colors.white.withOpacity(0.2),
@@ -173,7 +173,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
     );
   }
 
-  // â”€â”€ Form â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Form ───────────────────────────────────────────────────
   Widget _buildForm() {
     return Form(
       key: _formKey,
@@ -197,7 +197,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
             label: 'Secure Password',
             icon: Icons.lock_outline_rounded,
             obscureText: _obscurePassword,
-            hint: 'â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢',
+            hint: '••••••••',
             suffixIcon: IconButton(
               icon: Icon(
                 _obscurePassword ? Icons.visibility_off : Icons.visibility,
@@ -275,7 +275,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
     );
   }
 
-  // â”€â”€ Submit Button â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Submit Button ──────────────────────────────────────────
   Widget _buildSubmitButton() {
     return SizedBox(
       width: double.infinity,
@@ -298,7 +298,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
     );
   }
 
-  // â”€â”€ Divider â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Divider ────────────────────────────────────────────────
   Widget _buildDivider() {
     return Row(
       children: [
@@ -319,7 +319,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
     );
   }
 
-  // â”€â”€ Google Button â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Google Button ──────────────────────────────────────────
   Widget _buildGoogleButton() {
     return SizedBox(
       width: double.infinity,
@@ -344,7 +344,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
     );
   }
 
-  // â”€â”€ Error Message â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Error Message ──────────────────────────────────────────
   Widget _buildError() {
     return Padding(
       padding: const EdgeInsets.only(top: 16),
@@ -375,7 +375,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
     );
   }
 
-  // â”€â”€ Toggle Login / Signup â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Toggle Login / Signup ──────────────────────────────────
   Widget _buildToggle() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
