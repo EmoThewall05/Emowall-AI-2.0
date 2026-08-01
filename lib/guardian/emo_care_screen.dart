@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'guardian_ai.dart';
+import 'emo_care_service.dart';
 import 'emotion_detector.dart';
 
-class ButterflyGuardianScreen extends StatefulWidget {
+class EmoCareScreen extends StatefulWidget {
   @override
-  ButterflyGuardianScreenState createState() => ButterflyGuardianScreenState();
+  EmoCareScreenState createState() => EmoCareScreenState();
 }
 
-class ButterflyGuardianScreenState extends State<ButterflyGuardianScreen> {
+class EmoCareScreenState extends State<EmoCareScreen> {
   List<Map<String, dynamic>> messages = [];
   TextEditingController controller = TextEditingController();
   ScrollController scrollController = ScrollController();
@@ -22,7 +22,7 @@ class ButterflyGuardianScreenState extends State<ButterflyGuardianScreen> {
           children: [
             Text('🦋 ', style: TextStyle(fontSize: 20)),
             Text(
-              'Butterfly Guardian',
+              'Emo Care',
               style: TextStyle(
                 color: Color(0xFF00d4aa),
                 fontFamily: 'Space Mono',
@@ -145,7 +145,7 @@ class ButterflyGuardianScreenState extends State<ButterflyGuardianScreen> {
                   Icon(Icons.favorite, color: Color(0xFFff6b6b), size: 12),
                   SizedBox(width: 6),
                   Text(
-                    'Butterfly Guardian • Healing Mode',
+                    'Emo Care • Healing Mode',
                     style: TextStyle(
                       color: Color(0xFFff6b6b),
                       fontSize: 9,
@@ -239,7 +239,7 @@ class ButterflyGuardianScreenState extends State<ButterflyGuardianScreen> {
     String emotion = EmotionDetector.detect(text);
     
     // Get AI response
-    String response = await ButterflyGuardian.getResponse(text, emotion);
+    String response = await EmoCare.getResponse(text, emotion);
     
     // Add AI message
     setState(() {

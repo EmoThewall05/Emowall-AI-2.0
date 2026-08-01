@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'emotion_detector.dart';
 
-class ButterflyGuardian {
+class EmoCare {
   static const String _workerUrl =
       'https://emowall-guardian-ai.meradivin.workers.dev';
   static const String _emoKey = 'emo_75bb11d8d603c836f5768adb'; // replace with actual key
