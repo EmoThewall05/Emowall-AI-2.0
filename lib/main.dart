@@ -15,6 +15,7 @@ import 'package:emowall/media_verifier_ai.dart';
 import 'package:emowall/shield_mode.dart';
 import 'package:emowall/kidnap_mode.dart';
 import 'package:emowall/animal/animal_alert_screen.dart';
+import 'package:emowall/emo_care/emo_care_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -229,6 +230,11 @@ class _ModeSelectionScreenState extends State<ModeSelectionScreen> {
               Text('🐾 Nature Safety', style: GoogleFonts.syne(fontSize: 13, fontWeight: FontWeight.w700, color: const Color(0xFF8892A4))),
               const SizedBox(height: 12),
               _modeCard(context, '🐾', 'Animal Alert', 'Snake, Dog & Insect Detection', const Color(0xFFFF8C00), const AnimalAlertScreen()),
+              const SizedBox(height: 24),
+
+              Text('💚 Emo Care', style: GoogleFonts.syne(fontSize: 13, fontWeight: FontWeight.w700, color: const Color(0xFF8892A4))),
+              const SizedBox(height: 12),
+              _modeCard(context, '🦋', 'Emo Care', 'Your Silent Emotional Companion', const Color(0xFF00D4AA), EmoCareScreen()),
               const SizedBox(height: 24),
 
               Text('🔍 AI Tools', style: GoogleFonts.syne(fontSize: 13, fontWeight: FontWeight.w700, color: const Color(0xFF8892A4))),
