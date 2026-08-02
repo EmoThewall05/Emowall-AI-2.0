@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "194436853805",
+    "project_id": "gen-lang-client-0510617623",
+    "storage_bucket": "gen-lang-client-0510617623.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:194436853805:android:99bf3a6d97b82215a808a4",
+        "android_client_info": {
+          "package_name": "com.emobies.emowall"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDJ2L8hRM4NC2CLjGd9oOLE7oHY7SBgQ40"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
