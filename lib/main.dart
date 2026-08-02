@@ -18,12 +18,35 @@ import 'package:emowall/animal/animal_alert_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-  await Supabase.initialize(
-    url: 'https://havmduragglvstlxrgag.supabase.co',
-    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhhdm1kdXJhZ2dsdnN0bHhyZ2FnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3NjM5NDksImV4cCI6MjA5NDMzOTk0OX0.HqyIk3BN6pKu6cqYJvo-naVB3H6C6P3brQmnHMGlB-Q',
-  );
+  String? bootError;
+  try {
+    await Firebase.initializeApp().timeout(const Duration(seconds: 15));
+    await Supabase.initialize(
+      url: 'https://havmduragglvstlxrgag.supabase.co',
+      anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhhdm1kdXJhZ2dsdnN0bHhyZ2FnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3NjM5NDksImV4cCI6MjA5NDMzOTk0OX0.HqyIk3BN6pKu6cqYJvo-naVB3H6C6P3brQmnHMGlB-Q',
+    ).timeout(const Duration(seconds: 15));
+  } catch (e, st) {
+    bootError = 'BOOT ERROR:\n\n$e\n\n$st';
+  }
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+  if (bootError != null) {
+    runApp(MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
+        backgroundColor: Colors.black,
+        body: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: SelectableText(
+              bootError,
+              style: const TextStyle(color: Colors.redAccent, fontSize: 12),
+            ),
+          ),
+        ),
+      ),
+    ));
+    return;
+  }
   runApp(const EmowallApp());
 }
 
