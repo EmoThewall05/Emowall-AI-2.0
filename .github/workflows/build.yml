@@ -41,8 +41,23 @@ jobs:
           flutter build appbundle --release \
             --dart-define=GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
 
+      - name: Build APK
+        env:
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
+        run: |
+          flutter build apk --release \
+            --dart-define=GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
+
       - name: Upload AAB
         uses: actions/upload-artifact@v4
         with:
           name: emowall-release-aab
           path: build/app/outputs/bundle/release/app-release.aab
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: emowall-release-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
