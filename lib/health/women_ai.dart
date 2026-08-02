@@ -47,6 +47,20 @@ class _WomensHealthAIScreenState extends State<WomensHealthAIScreen>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              margin: const EdgeInsets.only(bottom: 16),
+              decoration: BoxDecoration(
+                color: Colors.amber.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: Colors.amber.withOpacity(0.4)),
+              ),
+              child: const Text(
+                'This app does not provide medical advice, diagnosis, or treatment. Please consult a licensed healthcare professional for any medical concerns.',
+                style: TextStyle(fontSize: 11, color: Colors.amber),
+              ),
+            ),
             _header(),
             const SizedBox(height: 20),
             _breastHealthCard(),
