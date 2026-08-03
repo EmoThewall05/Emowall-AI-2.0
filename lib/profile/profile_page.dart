@@ -3,6 +3,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import '../auth_service.dart';
+import '../login_page.dart';
 
 // ============================================================
 // COLORS
@@ -38,7 +41,6 @@ class EmergencyContact {
 // PROFILE PAGE
 // ============================================================
 class ProfilePage extends StatefulWidget {
-  // Pass these in from wherever the user's session/login info lives
   final String userName;
   final String userEmail;
   final DateTime memberSince;
@@ -57,6 +59,7 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   final List<EmergencyContact> _contacts = [];
   File? _profileImage;
+  bool _isUploading = false;
 
   Future<void> _pickImage() async {
     final picker = ImagePicker();
@@ -68,6 +71,98 @@ class _ProfilePageState extends State<ProfilePage> {
       setState(() {
         _profileImage = File(picked.path);
       });
+    }
+  }
+
+  Future<void> _saveProfileImage() async {
+    if (_profileImage == null) return;
+
+    final userId = Supabase.instance.client.auth.currentUser?.id;
+    if (userId == null) {
+      _showSnack('You must be signed in to save a photo.', isError: true);
+      return;
+    }
+
+    setState(() => _isUploading = true);
+
+    try {
+      final bytes = await _profileImage!.readAsBytes();
+      final path = '$userId/avatar.jpg';
+
+      await Supabase.instance.client.storage
+          .from('avatars')
+          .uploadBinary(
+            path,
+            bytes,
+            fileOptions: const FileOptions(
+              contentType: 'image/jpeg',
+              upsert: true,
+            ),
+          );
+
+      if (mounted) {
+        _showSnack('Profile photo saved.');
+      }
+    } catch (e) {
+      if (mounted) {
+        _showSnack('Failed to save photo: $e', isError: true);
+      }
+    } finally {
+      if (mounted) setState(() => _isUploading = false);
+    }
+  }
+
+  void _showSnack(String message, {bool isError = false}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: isError ? EmowallColors.danger : EmowallColors.green,
+      ),
+    );
+  }
+
+  Future<void> _signOut() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: EmowallColors.card,
+        title: const Text(
+          'Sign Out',
+          style: TextStyle(color: EmowallColors.textPrimary),
+        ),
+        content: const Text(
+          'Are you sure you want to sign out?',
+          style: TextStyle(color: EmowallColors.textSecondary),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text(
+              'Cancel',
+              style: TextStyle(color: EmowallColors.textSecondary),
+            ),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text(
+              'Sign Out',
+              style: TextStyle(color: EmowallColors.danger),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+
+    await AuthService().signOut();
+
+    if (mounted) {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) => const LoginPage()),
+        (route) => false,
+      );
     }
   }
 
@@ -216,6 +311,10 @@ class _ProfilePageState extends State<ProfilePage> {
         padding: const EdgeInsets.all(16),
         children: [
           _buildUserHeader(),
+          if (_profileImage != null) ...[
+            const SizedBox(height: 12),
+            _buildSaveImageButton(),
+          ],
           const SizedBox(height: 24),
           _buildSectionTitle('Emergency Contacts'),
           const SizedBox(height: 10),
@@ -228,7 +327,82 @@ class _ProfilePageState extends State<ProfilePage> {
           const SizedBox(height: 10),
           _buildSupportCard(context),
           const SizedBox(height: 24),
+          _buildSignOutButton(),
+          const SizedBox(height: 24),
         ],
+      ),
+    );
+  }
+
+  Widget _buildSaveImageButton() {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: EmowallColors.orange,
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+        onPressed: _isUploading ? null : _saveProfileImage,
+        child: _isUploading
+            ? const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Colors.black,
+                ),
+              )
+            : const Text(
+                'Save Profile Photo',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+      ),
+    );
+  }
+
+  Widget _buildSignOutButton() {
+    return InkWell(
+      onTap: _signOut,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: EmowallColors.card,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: EmowallColors.danger.withOpacity(0.4)),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: EmowallColors.danger.withOpacity(0.15),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.logout, color: EmowallColors.danger),
+            ),
+            const SizedBox(width: 14),
+            const Expanded(
+              child: Text(
+                'Sign Out',
+                style: TextStyle(
+                  color: EmowallColors.danger,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 15,
+                ),
+              ),
+            ),
+            const Icon(Icons.chevron_right, color: EmowallColors.textSecondary),
+          ],
+        ),
       ),
     );
   }
