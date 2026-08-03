@@ -32,6 +32,10 @@ jobs:
           echo "${{ secrets.KEYSTORE_BASE64 }}" | tr -d '\n' | base64 --decode > android/app/upload-keystore.p12
           ls -la android/app/upload-keystore.p12
 
+      - name: Print keystore SHA-1
+        run: |
+          keytool -list -v -keystore android/app/upload-keystore.p12 -storetype PKCS12 -storepass "${{ secrets.STORE_PASSWORD }}" | grep SHA1
+
       - name: Build AAB
         env:
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
