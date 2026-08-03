@@ -1,6 +1,8 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 
 // ============================================================
 // COLORS
@@ -14,6 +16,7 @@ class EmowallColors {
   static const Color textPrimary = Color(0xFFFFFFFF);
   static const Color textSecondary = Color(0xFFB0B0B0);
   static const Color danger = Color(0xFFE53935);
+  static const Color green = Color(0xFF2ECC71);
 }
 
 // ============================================================
@@ -53,6 +56,20 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   final List<EmergencyContact> _contacts = [];
+  File? _profileImage;
+
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final picked = await picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 80,
+    );
+    if (picked != null) {
+      setState(() {
+        _profileImage = File(picked.path);
+      });
+    }
+  }
 
   String _formatDate(DateTime d) {
     const months = [
@@ -226,34 +243,73 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
       child: Row(
         children: [
-          Container(
-            width: 64,
-            height: 64,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: const LinearGradient(
-                colors: [EmowallColors.orange, Color(0xFFFF9455)],
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: EmowallColors.orange.withOpacity(0.4),
-                  blurRadius: 16,
-                  spreadRadius: 2,
+          Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: _profileImage == null
+                      ? const LinearGradient(
+                          colors: [EmowallColors.orange, Color(0xFFFF9455)],
+                        )
+                      : null,
+                  image: _profileImage != null
+                      ? DecorationImage(
+                          image: FileImage(_profileImage!),
+                          fit: BoxFit.cover,
+                        )
+                      : null,
+                  boxShadow: [
+                    BoxShadow(
+                      color: EmowallColors.orange.withOpacity(0.4),
+                      blurRadius: 16,
+                      spreadRadius: 2,
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            child: Center(
-              child: Text(
-                widget.userName.isNotEmpty
-                    ? widget.userName[0].toUpperCase()
-                    : '?',
-                style: const TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
+                child: _profileImage == null
+                    ? Center(
+                        child: Text(
+                          widget.userName.isNotEmpty
+                              ? widget.userName[0].toUpperCase()
+                              : '?',
+                          style: const TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                      )
+                    : null,
+              ),
+              Positioned(
+                bottom: -2,
+                right: -2,
+                child: InkWell(
+                  onTap: _pickImage,
+                  borderRadius: BorderRadius.circular(20),
+                  child: Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: EmowallColors.green,
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: EmowallColors.background,
+                        width: 2,
+                      ),
+                    ),
+                    child: const Icon(
+                      Icons.camera_alt,
+                      size: 14,
+                      color: Colors.black,
+                    ),
+                  ),
                 ),
               ),
-            ),
+            ],
           ),
           const SizedBox(width: 16),
           Expanded(
