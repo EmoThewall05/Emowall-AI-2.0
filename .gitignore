@@ -5,3 +5,4 @@ build/
 *.log
 *.py
 .dart_tool/
+android/app/upload-keystore.p12
