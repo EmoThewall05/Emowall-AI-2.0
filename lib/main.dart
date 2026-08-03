@@ -16,6 +16,7 @@ import 'package:emowall/shield_mode.dart';
 import 'package:emowall/kidnap_mode.dart';
 import 'package:emowall/animal/animal_alert_screen.dart';
 import 'package:emowall/emo_care/emo_care_screen.dart';
+import 'package:emowall/profile/profile_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -196,7 +197,38 @@ class _ModeSelectionScreenState extends State<ModeSelectionScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 20),
-              const Center(child: ButterflyLogo(size: 70)),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Expanded(child: Center(child: ButterflyLogo(size: 70))),
+                  Positioned(
+                    child: GestureDetector(
+                      onTap: () {
+                        final user = FirebaseAuth.instance.currentUser;
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => ProfilePage(
+                              userName: user?.displayName ?? 'User',
+                              userEmail: user?.email ?? 'No email',
+                              memberSince: user?.metadata.creationTime ?? DateTime.now(),
+                            ),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF111519),
+                          shape: BoxShape.circle,
+                          border: Border.all(color: const Color(0xFFFF5500).withOpacity(0.6)),
+                        ),
+                        child: const Icon(Icons.person, color: Color(0xFFFF5500), size: 22),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
               const SizedBox(height: 16),
               Text('Emowall', style: GoogleFonts.syne(fontSize: 36, fontWeight: FontWeight.w800, color: const Color(0xFFFF5500))),
               Text('Your Silent Guardian', style: GoogleFonts.jetBrainsMono(fontSize: 12, color: const Color(0xFF8892A4))),
