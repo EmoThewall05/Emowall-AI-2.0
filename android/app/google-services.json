@@ -14,11 +14,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "194436853805-8arna1sdee125ratnqbefu7kp352gmj8.apps.googleusercontent.com",
+          "client_id": "194436853805-3er8kd03eu7kafvo52oli9e58eojq2br.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.emobies.emowall",
-            "certificate_hash": "027e1f67efe73aca824c0c59cdba5e5c0e78fb5b"
+            "certificate_hash": "09171a2c676c2ef24f972f56bc7c0b9ff85fc156"
           }
         },
         {
