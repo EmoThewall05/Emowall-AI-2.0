@@ -4,3 +4,4 @@
 build/
 *.log
 *.py
+.dart_tool/
