@@ -44,7 +44,7 @@ class AuthService {
       );
       return await _auth.signInWithCredential(credential);
     } catch (e) {
-      return null;
+      rethrow;
     }
   }
 
