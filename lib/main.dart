@@ -201,7 +201,8 @@ class _ModeSelectionScreenState extends State<ModeSelectionScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Expanded(child: Center(child: ButterflyLogo(size: 70))),
-                  Positioned(
+                  Align(
+                    alignment: Alignment.centerRight,
                     child: GestureDetector(
                       onTap: () {
                         final user = FirebaseAuth.instance.currentUser;
