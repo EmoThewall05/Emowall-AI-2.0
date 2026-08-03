@@ -70,7 +70,8 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
           password: _passwordController.text,
         );
       }
-      if (mounted) Navigator.of(context).pushReplacementNamed('/home');
+      // No manual navigation needed — StreamBuilder in main.dart
+      // automatically switches screens on auth state change.
     } catch (e) {
       setState(() => _errorMessage = e.toString());
     } finally {
@@ -82,7 +83,8 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
     setState(() { _isLoading = true; _errorMessage = null; });
     try {
       await _authService.signInWithGoogle();
-      if (mounted) Navigator.of(context).pushReplacementNamed('/home');
+      // No manual navigation needed — StreamBuilder in main.dart
+      // automatically switches screens on auth state change.
     } catch (e, st) {
       setState(() => _errorMessage = "$e\n\nSTACK:\n$st");
     } finally {
