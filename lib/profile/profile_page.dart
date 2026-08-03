@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../auth_service.dart';
 import '../login_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 // ============================================================
 // COLORS
@@ -77,7 +78,7 @@ class _ProfilePageState extends State<ProfilePage> {
   Future<void> _saveProfileImage() async {
     if (_profileImage == null) return;
 
-    final userId = Supabase.instance.client.auth.currentUser?.id;
+    final userId = FirebaseAuth.instance.currentUser?.uid;
     if (userId == null) {
       _showSnack('You must be signed in to save a photo.', isError: true);
       return;
