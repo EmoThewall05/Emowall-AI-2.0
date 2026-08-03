@@ -82,14 +82,46 @@ class EmoCareScreenState extends State<EmoCareScreen> {
           
           // Messages
           Expanded(
-            child: ListView.builder(
-              controller: scrollController,
-              padding: EdgeInsets.all(15),
-              itemCount: messages.length,
-              itemBuilder: (context, index) {
-                return _buildMessageBubble(messages[index]);
-              },
-            ),
+            child: messages.isEmpty
+                ? Center(
+                    child: TweenAnimationBuilder<double>(
+                      tween: Tween(begin: 0.0, end: 1.0),
+                      duration: Duration(seconds: 2),
+                      curve: Curves.easeInOut,
+                      builder: (context, value, child) {
+                        return Transform.translate(
+                          offset: Offset(0, -10 * value),
+                          child: Opacity(
+                            opacity: 0.5 + (0.5 * value),
+                            child: child,
+                          ),
+                        );
+                      },
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text('🦋', style: TextStyle(fontSize: 48)),
+                          SizedBox(height: 12),
+                          Text(
+                            'Whenever you are ready, I am here.',
+                            style: TextStyle(
+                              color: Colors.white38,
+                              fontSize: 12,
+                              fontFamily: 'Syne',
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                : ListView.builder(
+                    controller: scrollController,
+                    padding: EdgeInsets.all(15),
+                    itemCount: messages.length,
+                    itemBuilder: (context, index) {
+                      return _buildMessageBubble(messages[index]);
+                    },
+                  ),
           ),
           
           // Input
@@ -117,7 +149,14 @@ class EmoCareScreenState extends State<EmoCareScreen> {
             : isHealing
               ? Color(0xFF7c5cfc).withOpacity(0.15)
               : Color(0xFF141b22),
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.25),
+              blurRadius: 12,
+              offset: Offset(0, 4),
+            ),
+          ],
           border: Border.all(
             color: isUser 
               ? Color(0xFF00d4aa).withOpacity(0.3)
