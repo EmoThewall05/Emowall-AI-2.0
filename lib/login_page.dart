@@ -83,8 +83,8 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
     try {
       await _authService.signInWithGoogle();
       if (mounted) Navigator.of(context).pushReplacementNamed('/home');
-    } catch (e) {
-      setState(() => _errorMessage = e.toString());
+    } catch (e, st) {
+      setState(() => _errorMessage = "\$e\n\nSTACK:\n\$st");
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
