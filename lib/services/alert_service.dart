@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:telephony/telephony.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -14,9 +13,7 @@ class AlertService {
   static const String _telegramChatId = String.fromEnvironment('TELEGRAM_CHAT_ID');
   static const String _discordWebhook = String.fromEnvironment('DISCORD_WEBHOOK_URL');
 
-  final Telephony _telephony = Telephony.instance;
-
-  // 🚨 Send to ALL channels simultaneously (Telegram + Discord + SMS)
+  // 🚨 Send to ALL channels simultaneously (Telegram + Discord + SMS via backend)
   Future<void> sendEmergencyAlert({
     required String childName,
     required String reason,
@@ -36,7 +33,7 @@ class AlertService {
     await Future.wait([
       _sendTelegram(message),
       _sendDiscord(message, reason),
-      _sendSmsToEmergencyContacts(message),
+      _sendSmsViaBackend(message),
     ]);
   }
 
@@ -91,7 +88,7 @@ ${isFree ? '💚 Kerala Free Protection' : '🛡️ Emowall AI 2.0'}
             {
               'title': '🚨 EMOWALL EMERGENCY',
               'description': message,
-              'color': 16711680, // Red
+              'color': 16711680,
               'footer': {
                 'text': 'Emowall AI 2.0 — 177 Countries Protection'
               },
@@ -105,34 +102,29 @@ ${isFree ? '💚 Kerala Free Protection' : '🛡️ Emowall AI 2.0'}
     }
   }
 
-  // 📩 SMS — mandatory offline-safe fallback channel
-  // Fetches the user's saved emergency contacts (parent/relative/principal)
-  // from Supabase and sends each one a direct SMS automatically.
-  Future<void> _sendSmsToEmergencyContacts(String message) async {
+  // 📩 SMS — now sent via a secure backend (Supabase Edge Function → Twilio).
+  // No SEND_SMS permission needed on-device anymore.
+  Future<void> _sendSmsViaBackend(String message) async {
     try {
       final uid = FirebaseAuth.instance.currentUser?.uid;
       if (uid == null) return;
 
-      final bool? granted = await _telephony.requestSmsPermissions;
-      if (granted != true) return;
+      final session = Supabase.instance.client.auth.currentSession;
+      final accessToken = session?.accessToken;
 
-      final data = await Supabase.instance.client
-          .from('emergency_contacts')
-          .select('phone')
-          .eq('firebase_uid', uid);
-
-      final contacts = List<Map<String, dynamic>>.from(data);
-      if (contacts.isEmpty) return;
-
-      for (final contact in contacts) {
-        final phone = (contact['phone'] as String?)?.trim();
-        if (phone == null || phone.isEmpty) continue;
-        try {
-          await _telephony.sendSms(to: phone, message: message);
-        } catch (e) {
-          // Continue to next contact even if one fails
-        }
-      }
+      await http.post(
+        Uri.parse(
+          '${Supabase.instance.client.supabaseUrl}/functions/v1/send-emergency-sms',
+        ),
+        headers: {
+          'Content-Type': 'application/json',
+          if (accessToken != null) 'Authorization': 'Bearer $accessToken',
+        },
+        body: jsonEncode({
+          'firebase_uid': uid,
+          'message': message,
+        }),
+      ).timeout(const Duration(seconds: 8));
     } catch (e) {
       // Silent fail — Telegram/Discord channels still cover the alert
     }
