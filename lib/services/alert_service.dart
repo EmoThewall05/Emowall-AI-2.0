@@ -114,7 +114,7 @@ ${isFree ? '💚 Kerala Free Protection' : '🛡️ Emowall AI 2.0'}
 
       await http.post(
         Uri.parse(
-          '${Supabase.instance.client.supabaseUrl}/functions/v1/send-emergency-sms',
+          'https://ovmjieytgtxlkvguughy.supabase.co/functions/v1/send-emergency-sms',
         ),
         headers: {
           'Content-Type': 'application/json',
