@@ -9,6 +9,8 @@ import '../services/alert_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'screens/emergency_contacts_screen.dart';
+import '../services/health_watch_service.dart';
+import '../widgets/health_consent_dialog.dart';
 
 class KidnapModeScreen extends StatefulWidget {
   const KidnapModeScreen({super.key});
@@ -21,6 +23,7 @@ class _KidnapModeScreenState extends State<KidnapModeScreen> {
   final VerificationChainService _chainService = VerificationChainService();
   final LocationService _locationService = LocationService();
   final AlertService _alertService = AlertService();
+final HealthWatchService _healthService = HealthWatchService();
 
   bool _isActive = false;
   bool _soundDetectOn = false;
@@ -74,6 +77,9 @@ class _KidnapModeScreenState extends State<KidnapModeScreen> {
     // Start sound detection
     await _startSoundDetection();
 
+    // Heart-rate distress signal (after user consent)
+    await _startHealthMonitoring();
+
     // Notify via Telegram + Discord
     await _alertService.sendInfoAlert(
       '🟢 Emowall Kidnap Mode ACTIVATED\n'
@@ -83,6 +89,7 @@ class _KidnapModeScreenState extends State<KidnapModeScreen> {
   }
 
   void _deactivateProtection() {
+    _healthService.stopMonitoring();
     _soundService.stopDetection();
     _locationService.stopTracking();
     setState(() {
@@ -90,6 +97,24 @@ class _KidnapModeScreenState extends State<KidnapModeScreen> {
       _soundDetectOn = false;
       _status = '🛡️ Kidnap Mode Ready';
     });
+  }
+
+  // ❤️ Heart-rate distress signal (only after explicit user consent)
+  Future<void> _startHealthMonitoring() async {
+    if (!mounted) return;
+    final agreed = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const HealthConsentDialog(),
+    );
+    if (agreed != true) return;
+
+    final granted = await _healthService.requestPermissions();
+    if (!granted) return;
+
+    _healthService.startMonitoring(
+      onAbnormal: (reason) => _triggerSilentSOS(reason),
+    );
   }
 
   Future<void> _startSoundDetection() async {
@@ -199,6 +224,7 @@ class _KidnapModeScreenState extends State<KidnapModeScreen> {
   @override
   void dispose() {
     _sosTimer?.cancel();
+    _healthService.stopMonitoring();
     _soundService.stopDetection();
     _locationService.stopTracking();
     super.dispose();
