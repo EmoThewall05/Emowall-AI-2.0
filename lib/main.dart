@@ -124,10 +124,10 @@ class _ModeSelectionScreenState extends State<ModeSelectionScreen> {
                 textAlign: TextAlign.center),
               const SizedBox(height: 16),
               _permRow('📍', 'Location', 'Detect unsafe zones & send live location during SOS'),
-              _permRow('🎤', 'Microphone', 'Detect danger sounds, crying & bad words silently'),
-              _permRow('📷', 'Camera', 'Animal Alert — identify dangerous creatures via AI scan'),
-              _permRow('⌚', 'Body Sensors', 'Heart rate & fall detection via smartwatch or phone'),
-              _permRow('📞', 'Phone & SMS', 'Auto SOS call & alert to emergency contacts only'),
+              _permRow('🎤', 'Microphone', 'Danger words are recognised by the Android speech service. We never record or store audio'),
+              _permRow('📷', 'Camera', 'Animal Alert and Media Check: photos you choose are sent to AI services (Anthropic, Google) for analysis'),
+              _permRow('⌚', 'Health Connect', 'Heart rate, only with your consent, to detect possible distress. Falls use the phone motion sensor'),
+              _permRow('📞', 'SMS Alerts', 'Emergency SMS alerts go only to the contacts you add'),
               _permRow('🔔', 'Notifications', 'Silent SOS alerts to parents & guardians'),
               const SizedBox(height: 16),
               Container(
@@ -138,7 +138,7 @@ class _ModeSelectionScreenState extends State<ModeSelectionScreen> {
                   border: Border.all(color: const Color(0xFF00E676), width: 1),
                 ),
                 child: Text(
-                  '🔐 We never collect, store or share your personal data. No name. No number. No history. Your privacy is sacred.',
+                  '🔐 We keep only what safety needs: your emergency contacts and alert details. We never sell your data. See our Privacy Policy.',
                   style: GoogleFonts.jetBrainsMono(fontSize: 10, color: const Color(0xFF00E676)),
                   textAlign: TextAlign.center,
                 ),

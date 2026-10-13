@@ -68,6 +68,8 @@ class _ProfilePageState extends State<ProfilePage> {
     final picked = await picker.pickImage(
       source: ImageSource.gallery,
       imageQuality: 80,
+      maxWidth: 512,
+      maxHeight: 512,
     );
     if (picked != null) {
       setState(() {
