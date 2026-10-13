@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:emowall/services/profile_api.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -90,16 +91,7 @@ class _ProfilePageState extends State<ProfilePage> {
       final bytes = await _profileImage!.readAsBytes();
       final path = '$userId/avatar.jpg';
 
-      await Supabase.instance.client.storage
-          .from('avatars')
-          .uploadBinary(
-            path,
-            bytes,
-            fileOptions: const FileOptions(
-              contentType: 'image/jpeg',
-              upsert: true,
-            ),
-          );
+      await ProfileApi.uploadAvatar(bytes);
 
       if (mounted) {
         _showSnack('Profile photo saved.');

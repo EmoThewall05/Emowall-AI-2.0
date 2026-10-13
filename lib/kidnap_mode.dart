@@ -11,6 +11,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'screens/emergency_contacts_screen.dart';
 import '../services/health_watch_service.dart';
 import '../widgets/health_consent_dialog.dart';
+import 'package:emowall/services/contacts_api.dart';
 
 class KidnapModeScreen extends StatefulWidget {
   const KidnapModeScreen({super.key});
@@ -47,11 +48,7 @@ final HealthWatchService _healthService = HealthWatchService();
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) return;
     try {
-      final data = await Supabase.instance.client
-          .from('emergency_contacts')
-          .select('name, phone')
-          .eq('firebase_uid', uid);
-      final fetched = List<Map<String, dynamic>>.from(data);
+      final fetched = await ContactsApi.list();
       if (fetched.isNotEmpty && mounted) {
         setState(() {
           _contacts = fetched

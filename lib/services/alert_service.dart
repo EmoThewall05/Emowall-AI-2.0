@@ -106,24 +106,19 @@ ${isFree ? '💚 Kerala Free Protection' : '🛡️ Emowall AI 2.0'}
   // No SEND_SMS permission needed on-device anymore.
   Future<void> _sendSmsViaBackend(String message) async {
     try {
-      final uid = FirebaseAuth.instance.currentUser?.uid;
-      if (uid == null) return;
-
-      final session = Supabase.instance.client.auth.currentSession;
-      final accessToken = session?.accessToken;
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) return;
+      final idToken = await user.getIdToken();
 
       await http.post(
         Uri.parse(
-          'https://ovmjieytgtxlkvguughy.supabase.co/functions/v1/send-emergency-sms',
+          'https://eyonwjbwefdywqoywyif.supabase.co/functions/v1/send-emergency-sms',
         ),
         headers: {
           'Content-Type': 'application/json',
-          if (accessToken != null) 'Authorization': 'Bearer $accessToken',
+          'Authorization': 'Bearer $idToken',
         },
-        body: jsonEncode({
-          'firebase_uid': uid,
-          'message': message,
-        }),
+        body: jsonEncode({'message': message}),
       ).timeout(const Duration(seconds: 8));
     } catch (e) {
       // Silent fail — Telegram/Discord channels still cover the alert

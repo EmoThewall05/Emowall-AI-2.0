@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:emowall/services/contacts_api.dart';
 
 class EmergencyContactsScreen extends StatefulWidget {
   const EmergencyContactsScreen({super.key});
@@ -10,7 +10,6 @@ class EmergencyContactsScreen extends StatefulWidget {
 }
 
 class _EmergencyContactsScreenState extends State<EmergencyContactsScreen> {
-  final SupabaseClient _supabase = Supabase.instance.client;
   List<Map<String, dynamic>> _contacts = [];
   bool _loading = true;
 
@@ -28,13 +27,9 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreen> {
       return;
     }
     try {
-      final data = await _supabase
-          .from('emergency_contacts')
-          .select()
-          .eq('firebase_uid', _uid as String)
-          .order('created_at');
+      final data = await ContactsApi.list();
       setState(() {
-        _contacts = List<Map<String, dynamic>>.from(data);
+        _contacts = data;
         _loading = false;
       });
     } catch (e) {
@@ -96,18 +91,18 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreen> {
 
     try {
       if (existing == null) {
-        await _supabase.from('emergency_contacts').insert({
-          'firebase_uid': _uid,
-          'name': nameCtrl.text.trim(),
-          'relation': relationCtrl.text.trim(),
-          'phone': phoneCtrl.text.trim(),
-        });
+        await ContactsApi.add(
+          name: nameCtrl.text.trim(),
+          relation: relationCtrl.text.trim(),
+          phone: phoneCtrl.text.trim(),
+        );
       } else {
-        await _supabase.from('emergency_contacts').update({
-          'name': nameCtrl.text.trim(),
-          'relation': relationCtrl.text.trim(),
-          'phone': phoneCtrl.text.trim(),
-        }).eq('id', existing['id']);
+        await ContactsApi.update(
+          existing['id'] as String,
+          name: nameCtrl.text.trim(),
+          relation: relationCtrl.text.trim(),
+          phone: phoneCtrl.text.trim(),
+        );
       }
       await _loadContacts();
     } catch (e) {
@@ -120,7 +115,7 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreen> {
 
   Future<void> _deleteContact(String id) async {
     try {
-      await _supabase.from('emergency_contacts').delete().eq('id', id);
+      await ContactsApi.delete(id);
       await _loadContacts();
     } catch (e) {
       if (mounted) {

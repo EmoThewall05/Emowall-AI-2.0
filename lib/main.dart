@@ -24,8 +24,8 @@ void main() async {
   try {
     await Firebase.initializeApp().timeout(const Duration(seconds: 15));
     await Supabase.initialize(
-      url: 'https://havmduragglvstlxrgag.supabase.co',
-      anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhhdm1kdXJhZ2dsdnN0bHhyZ2FnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3NjM5NDksImV4cCI6MjA5NDMzOTk0OX0.HqyIk3BN6pKu6cqYJvo-naVB3H6C6P3brQmnHMGlB-Q',
+      url: 'https://eyonwjbwefdywqoywyif.supabase.co',
+      anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5b253amJ3ZWZkeXdxb3l3eWlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE3NTE3NjcsImV4cCI6MjEwNzMyNzc2N30.8ffvTXSTmhw0Z2mxrhuwnPgYaebgXcBnlvBtywDBsaQ',
     ).timeout(const Duration(seconds: 15));
   } catch (e, st) {
     bootError = 'BOOT ERROR:\n\n$e\n\n$st';
