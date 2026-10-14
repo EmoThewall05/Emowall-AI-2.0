@@ -33,7 +33,6 @@ class AlertService {
     await Future.wait([
       _sendTelegram(message),
       _sendDiscord(message, reason),
-      _sendSmsViaBackend(message),
     ]);
   }
 

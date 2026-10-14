@@ -416,10 +416,6 @@ final HealthWatchService _healthService = HealthWatchService();
                   style: GoogleFonts.syne(
                       fontWeight: FontWeight.w700, color: Colors.white)),
               const SizedBox(height: 12),
-              _alertChannel('📱 WhatsApp', true),
-              _alertChannel('✈️ Telegram', true),
-              _alertChannel('🎮 Discord', true),
-              _alertChannel('🚔 Kerala Police', true),
               _alertChannel('📩 SMS', true),
               _alertChannel('📍 Live GPS', true),
               const SizedBox(height: 12),

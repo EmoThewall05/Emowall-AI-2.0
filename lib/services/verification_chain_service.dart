@@ -1,33 +1,63 @@
 import 'dart:async';
-import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
+import 'contacts_api.dart';
 import 'location_service.dart';
+import 'sos_api.dart';
 
+/// Escalation: parent -> relative -> principal -> all contacts.
+/// Every step is a server-sent SMS to a contact the user added.
+/// Nothing opens WhatsApp or the dialer, and no authority is contacted
+/// automatically.
 class VerificationChainService {
-  static final VerificationChainService _instance = VerificationChainService._internal();
+  static final VerificationChainService _instance =
+      VerificationChainService._internal();
   factory VerificationChainService() => _instance;
   VerificationChainService._internal();
 
-  Timer? _chainTimer;
-  int _currentStep = 0;
   bool _isChainActive = false;
   bool _verified = false;
+  int _runId = 0;
+  int _currentStep = 0;
   String _alertReason = '';
-
-  // Contacts — app-ൽ user set ചെയ്യും
-  final List<ChainContact> contacts = [
-    ChainContact(name: 'Parent/Guardian', phone: '+91XXXXXXXXXX', role: ContactRole.parent, windowSeconds: 60),
-    ChainContact(name: 'Relative', phone: '+91XXXXXXXXXX', role: ContactRole.relative, windowSeconds: 30),
-    ChainContact(name: 'School Principal', phone: '+91XXXXXXXXXX', role: ContactRole.principal, windowSeconds: 30),
-  ];
-
-  // Government contacts
-  static const String _keralaPolice = '919497900000';
-  static const String _cyberCell = '911930';
-  static const String _childHelpline = '911098';
-  static const String _womenHelpline = '911091';
-
+  String? _eventId;
+  String _childName = 'A child';
   Function(ChainStatus)? _onStatusUpdate;
+
+  final List<ChainContact> contacts = [];
+
+  ContactRole _roleFor(String relation) {
+    final r = relation.toLowerCase();
+    if (r.contains('principal') || r.contains('teacher') || r.contains('school')) {
+      return ContactRole.principal;
+    }
+    if (r.contains('parent') || r.contains('mother') || r.contains('father') ||
+        r.contains('mom') || r.contains('dad') || r.contains('amma') ||
+        r.contains('achan') || r.contains('guardian')) {
+      return ContactRole.parent;
+    }
+    return ContactRole.relative;
+  }
+
+  void _emit(int step, String name, ContactRole role, int wait, String message) {
+    _onStatusUpdate?.call(ChainStatus(
+      step: step,
+      totalSteps: contacts.length,
+      currentContact: name,
+      role: role,
+      waitingSeconds: wait,
+      message: message,
+    ));
+  }
+
+  Future<T?> _try<T>(Future<T> Function() f) async {
+    try {
+      return await f();
+    } catch (e) {
+      debugPrint('SOS call failed: $e');
+      return null;
+    }
+  }
 
   Future<void> startChain({
     required String reason,
@@ -39,147 +69,161 @@ class VerificationChainService {
     _currentStep = 0;
     _alertReason = reason;
     _onStatusUpdate = onStatusUpdate;
+    final runId = ++_runId;
 
-    debugPrint('🚨 Verification chain started: $reason');
-    await _processStep();
-  }
+    final display = FirebaseAuth.instance.currentUser?.displayName?.trim() ?? '';
+    _childName = display.isEmpty ? 'A child' : display.split(' ').first;
 
-  Future<void> _processStep() async {
-    if (_verified || !_isChainActive) return;
+    try {
+      final list = await ContactsApi.list();
+      final found = <ChainContact>[];
+      for (final c in list) {
+        final phone = (c['phone'] ?? '').toString().trim();
+        if (phone.isEmpty) continue;
+        found.add(ChainContact(
+          id: (c['id'] ?? '').toString(),
+          name: (c['name'] ?? '').toString(),
+          phone: phone,
+          role: _roleFor((c['relation'] ?? '').toString()),
+          windowSeconds: 30,
+        ));
+      }
+      found.sort((a, b) => a.role.index.compareTo(b.role.index));
+      contacts
+        ..clear()
+        ..addAll([
+          for (var i = 0; i < found.length; i++)
+            ChainContact(
+              id: found[i].id,
+              name: found[i].name,
+              phone: found[i].phone,
+              role: found[i].role,
+              windowSeconds: i == 0 ? 60 : 30,
+            ),
+        ]);
 
-    // All contacts exhausted → Auto SOS
-    if (_currentStep >= contacts.length) {
-      await _triggerAutoSOS();
+      if (contacts.isEmpty) {
+        _isChainActive = false;
+        _emit(0, '', ContactRole.parent, 0,
+            '⚠️ No emergency contacts. Add contacts in Profile so alerts can be sent.');
+        return;
+      }
+
+      final pos = await LocationService().currentPosition();
+      _eventId = await SosApi.start(
+        reason: reason,
+        childName: _childName,
+        lat: pos?.latitude,
+        lng: pos?.longitude,
+      );
+    } catch (e) {
+      debugPrint('Chain start failed: $e');
+      _isChainActive = false;
+      _emit(0, '', ContactRole.parent, 0,
+          '⚠️ Could not reach the alert server. Check the internet connection.');
       return;
     }
 
-    final contact = contacts[_currentStep];
+    unawaited(LocationService()
+        .startLiveTracking(contacts: const [], reason: reason, silent: true));
+    unawaited(_run(runId));
+  }
 
-    // Notify current contact
-    await _notifyContact(contact);
+  Future<void> _run(int runId) async {
+    bool active() => _isChainActive && !_verified && _runId == runId;
 
-    _onStatusUpdate?.call(ChainStatus(
-      step: _currentStep + 1,
-      totalSteps: contacts.length,
-      currentContact: contact.name,
-      role: contact.role,
-      waitingSeconds: contact.windowSeconds,
-      message: '⏳ Waiting for ${contact.name} to respond...',
-    ));
-
-    // Wait for response window
-    _chainTimer = Timer(Duration(seconds: contact.windowSeconds), () async {
-      if (!_verified && _isChainActive) {
-        _currentStep++;
-        await _processStep();
+    for (var i = 0; i < contacts.length && active(); i++) {
+      final c = contacts[i];
+      _currentStep = i;
+      final pos = await LocationService().currentPosition();
+      final res = await _try(() => SosApi.notify(
+            eventId: _eventId!,
+            contactId: c.id,
+            childName: _childName,
+            lat: pos?.latitude,
+            lng: pos?.longitude,
+          ));
+      if (!active()) return;
+      if (res != null && res['status'] == 'safe') {
+        _markSafe();
+        return;
       }
-    });
+      final sent = res == null ? 0 : (res['sent'] ?? 0) as int;
+      _emit(
+        i + 1,
+        c.name,
+        c.role,
+        c.windowSeconds,
+        sent > 0
+            ? '⏳ Alert sent to ${c.name}. Waiting ${c.windowSeconds}s for confirmation...'
+            : '⚠️ SMS to ${c.name} could not be sent. Escalating...',
+      );
+
+      var waited = 0;
+      while (waited < c.windowSeconds && active()) {
+        await Future.delayed(const Duration(seconds: 5));
+        waited += 5;
+        if (!active()) return;
+        final st = await _try(() => SosApi.status(_eventId!));
+        if (st == 'safe') {
+          _markSafe();
+          return;
+        }
+      }
+    }
+    if (active()) await _autoSOS();
   }
 
-  Future<void> _notifyContact(ChainContact contact) async {
-    final phone = contact.phone.replaceAll('+', '').replaceAll(' ', '');
-    
-    final msg = Uri.encodeComponent(
-      '🚨 EMOWALL EMERGENCY ALERT\n'
-      '━━━━━━━━━━━━━━━━━━━\n'
-      'Child needs help: $_alertReason\n'
-      '📍 Live Location: https://maps.google.com/?q=mylocation\n'
-      '⏰ ${DateTime.now().toString().substring(0, 19)}\n'
-      '━━━━━━━━━━━━━━━━━━━\n'
-      '✅ Reply "SAFE" if child is okay\n'
-      '🚨 Reply "HELP" to escalate immediately\n'
-      'Auto SOS in ${contact.windowSeconds} seconds if no response.\n'
-      '🛡️ Emowall AI 2.0',
+  Future<void> _autoSOS() async {
+    _emit(contacts.length, 'All contacts', ContactRole.authority, 0,
+        '🚨 No confirmation. Alerting ALL contacts...');
+    final pos = await LocationService().currentPosition();
+    final res = await _try(() => SosApi.notify(
+          eventId: _eventId!,
+          all: true,
+          childName: _childName,
+          lat: pos?.latitude,
+          lng: pos?.longitude,
+        ));
+    final sent = res == null ? 0 : (res['sent'] ?? 0) as int;
+    _emit(
+      contacts.length,
+      'All contacts',
+      ContactRole.authority,
+      0,
+      sent > 0
+          ? '🚨 All contacts alerted. If the child is in danger, call 112 now.'
+          : '⚠️ Alerts could not be sent. Call 112 now.',
     );
-
-    // WhatsApp
-    final waUrl = 'https://wa.me/$phone?text=$msg';
-    if (await canLaunchUrl(Uri.parse(waUrl))) {
-      await launchUrl(Uri.parse(waUrl), mode: LaunchMode.externalApplication);
-    }
-
-    // Direct call
-    await Future.delayed(const Duration(seconds: 3));
-    final callUrl = 'tel:${contact.phone}';
-    if (await canLaunchUrl(Uri.parse(callUrl))) {
-      await launchUrl(Uri.parse(callUrl));
-    }
+    _isChainActive = false;
   }
 
-  // Parent/relative confirms child is safe
-  void confirmSafe() {
+  void _markSafe() {
     _verified = true;
-    _chainTimer?.cancel();
     _isChainActive = false;
-    _onStatusUpdate?.call(ChainStatus(
-      step: _currentStep,
-      totalSteps: contacts.length,
-      currentContact: '',
-      role: ContactRole.parent,
-      waitingSeconds: 0,
-      message: '✅ Confirmed safe. Alert cancelled.',
-    ));
+    _runId++;
+    LocationService().stopTracking();
+    SosApi.currentEventId = null;
+    _emit(_currentStep, '', ContactRole.parent, 0,
+        '✅ Confirmed safe. Alert cancelled.');
   }
 
-  Future<void> _triggerAutoSOS() async {
-    _onStatusUpdate?.call(ChainStatus(
-      step: contacts.length,
-      totalSteps: contacts.length,
-      currentContact: 'Police + Authorities',
-      role: ContactRole.authority,
-      waitingSeconds: 0,
-      message: '🚨 AUTO SOS TRIGGERED — Alerting authorities!',
-    ));
-
-    // Start live GPS tracking
-    await LocationService().startLiveTracking(
-      contacts: contacts.map((c) => {'name': c.name, 'phone': c.phone}).toList(),
-      reason: _alertReason,
-      silent: true,
-    );
-
-    final sosMsg = Uri.encodeComponent(
-      '🚨🚨 EMERGENCY — EMOWALL AUTO SOS 🚨🚨\n'
-      '━━━━━━━━━━━━━━━━━━━\n'
-      'CHILD IN DANGER: $_alertReason\n'
-      '📍 Live Location: https://maps.google.com/?q=mylocation\n'
-      '⏰ ${DateTime.now().toString().substring(0, 19)}\n'
-      '━━━━━━━━━━━━━━━━━━━\n'
-      'No response from family contacts.\n'
-      'IMMEDIATE ACTION REQUIRED.\n'
-      '🛡️ Emowall AI 2.0 — Auto Alert System',
-    );
-
-    // Alert all authorities simultaneously
-    final authorities = [
-      _keralaPolice,
-      _cyberCell,
-      _childHelpline,
-      _womenHelpline,
-    ];
-
-    for (final number in authorities) {
-      final url = 'https://wa.me/$number?text=$sosMsg';
-      if (await canLaunchUrl(Uri.parse(url))) {
-        await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
-      }
-      await Future.delayed(const Duration(milliseconds: 500));
-    }
-
-    // Call police directly
-    final policeCall = 'tel:+$_keralaPolice';
-    if (await canLaunchUrl(Uri.parse(policeCall))) {
-      await launchUrl(Uri.parse(policeCall));
-    }
-
-    _isChainActive = false;
+  /// The child (or a parent in the app) confirms safety.
+  void confirmSafe() {
+    final id = _eventId;
+    _markSafe();
+    if (id != null) unawaited(_try(() => SosApi.markSafe(id)));
   }
 
   void stopChain() {
-    _chainTimer?.cancel();
+    _runId++;
     _isChainActive = false;
     _verified = false;
     _currentStep = 0;
+    final id = _eventId;
+    _eventId = null;
+    SosApi.currentEventId = null;
+    if (id != null) unawaited(_try(() => SosApi.close(id)));
   }
 
   bool get isActive => _isChainActive;
@@ -189,12 +233,14 @@ class VerificationChainService {
 enum ContactRole { parent, relative, principal, authority }
 
 class ChainContact {
+  final String id;
   final String name;
   final String phone;
   final ContactRole role;
   final int windowSeconds;
 
   ChainContact({
+    this.id = '',
     required this.name,
     required this.phone,
     required this.role,
