@@ -6,3 +6,13 @@ build/
 *.py
 .dart_tool/
 android/app/upload-keystore.p12
+
+# ===== SECRETS & BUILD =====
+.env
+.env.*
+build/
+*.bak
+*.p12
+*.jks
+*.bak*
+.flutter-plugins-dependencies
