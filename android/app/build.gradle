@@ -32,7 +32,7 @@ android {
     defaultConfig {
         applicationId "com.emobies.emowall"
         minSdkVersion 26
-        targetSdkVersion flutter.targetSdkVersion
+        targetSdkVersion 36
         versionCode flutter.versionCode
         versionName flutter.versionName
     }

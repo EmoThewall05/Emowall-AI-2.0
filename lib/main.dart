@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' hide User;
@@ -123,12 +124,19 @@ class _ModeSelectionScreenState extends State<ModeSelectionScreen> {
                 style: GoogleFonts.jetBrainsMono(fontSize: 11, color: const Color(0xFF8892A4)),
                 textAlign: TextAlign.center),
               const SizedBox(height: 16),
-              _permRow('📍', 'Location', 'Detect unsafe zones & send live location during SOS'),
+              _permRow('📍', 'Location', 'Detect unsafe zones & send live location during SOS. While Protection is active, location may also be used when the app is closed'),
               _permRow('🎤', 'Microphone', 'Danger words are recognised by the Android speech service. We never record or store audio'),
               _permRow('📷', 'Camera', 'Animal Alert and Media Check: photos you choose are sent to AI services (Anthropic, Google) for analysis'),
               _permRow('⌚', 'Health Connect', 'Heart rate, only with your consent, to detect possible distress. Falls use the phone motion sensor'),
-              _permRow('📞', 'SMS Alerts', 'Emergency SMS alerts go only to the contacts you add'),
+              _permRow('📞', 'SMS Alerts', 'Our server (via Twilio) sends emergency SMS to the contacts you add. They receive your name, location and the alert reason'),
               _permRow('🔔', 'Notifications', 'Silent SOS alerts to parents & guardians'),
+              TextButton(
+                onPressed: () => launchUrl(
+                  Uri.parse('https://emobies05.github.io/public-/emowall-privacy-policy.html'),
+                  mode: LaunchMode.externalApplication,
+                ),
+                child: Text('Read our Privacy Policy', style: GoogleFonts.jetBrainsMono(fontSize: 11, color: const Color(0xFF00E676))),
+              ),
               const SizedBox(height: 16),
               Container(
                 padding: const EdgeInsets.all(12),
@@ -138,7 +146,7 @@ class _ModeSelectionScreenState extends State<ModeSelectionScreen> {
                   border: Border.all(color: const Color(0xFF00E676), width: 1),
                 ),
                 child: Text(
-                  '🔐 We keep only what safety needs: your emergency contacts and alert details. We never sell your data. See our Privacy Policy.',
+                  '🔐 Safety data (your emergency contacts, alerts and live location during an SOS) is stored on our secure servers and shared only with the contacts you choose and the services that deliver alerts. We never sell your data.',
                   style: GoogleFonts.jetBrainsMono(fontSize: 10, color: const Color(0xFF00E676)),
                   textAlign: TextAlign.center,
                 ),

@@ -5,7 +5,6 @@ import 'dart:async';
 import '../services/sound_detection_service.dart';
 import '../services/verification_chain_service.dart';
 import '../services/location_service.dart';
-import '../services/alert_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'screens/emergency_contacts_screen.dart';
@@ -23,7 +22,6 @@ class _KidnapModeScreenState extends State<KidnapModeScreen> {
   final SoundDetectionService _soundService = SoundDetectionService();
   final VerificationChainService _chainService = VerificationChainService();
   final LocationService _locationService = LocationService();
-  final AlertService _alertService = AlertService();
 final HealthWatchService _healthService = HealthWatchService();
 
   bool _isActive = false;
@@ -77,12 +75,6 @@ final HealthWatchService _healthService = HealthWatchService();
     // Heart-rate distress signal (after user consent)
     await _startHealthMonitoring();
 
-    // Notify via Telegram + Discord
-    await _alertService.sendInfoAlert(
-      '🟢 Emowall Kidnap Mode ACTIVATED\n'
-      'Silent monitoring started.\n'
-      'Child is protected. 🛡️',
-    );
   }
 
   void _deactivateProtection() {
@@ -143,14 +135,6 @@ final HealthWatchService _healthService = HealthWatchService();
       },
     );
 
-    // Telegram + Discord silent alert
-    await _alertService.sendEmergencyAlert(
-      childName: 'Child',
-      reason: reason,
-      location: 'Live location tracking active',
-      country: 'India',
-      isFree: true,
-    );
   }
 
   Future<void> _showThreatAlert(String reason) async {
@@ -193,14 +177,6 @@ final HealthWatchService _healthService = HealthWatchService();
       reason: reason,
     );
 
-    // Telegram + Discord
-    await _alertService.sendEmergencyAlert(
-      childName: 'Child',
-      reason: reason,
-      location: 'Live GPS Active',
-      country: 'India',
-      isFree: true,
-    );
   }
 
   void _cancelSOS() {

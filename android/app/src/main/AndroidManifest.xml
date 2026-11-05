@@ -16,13 +16,12 @@
 
     <!-- Background Service -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_HEALTH"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
 
     <!-- Health Connect -->
     <uses-permission android:name="android.permission.health.READ_HEART_RATE"/>
-    <uses-permission android:name="android.permission.health.READ_BLOOD_OXYGEN"/>
 
 
     <!-- Sensors -->
@@ -30,10 +29,15 @@
     <!-- Notifications -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
+    <!-- HEALTH CONNECT QUERIES -->
+    <queries>
+        <package android:name="com.google.android.apps.healthdata"/>
+    </queries>
+
     <application
         android:label="Emowall"
         android:icon="@mipmap/ic_launcher"
-        android:usesCleartextTraffic="true">
+        android:usesCleartextTraffic="false">
 
         <activity
             android:name=".MainActivity"
@@ -48,6 +52,10 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+            <!-- HEALTH CONNECT RATIONALE -->
+            <intent-filter>
+                <action android:name="androidx.health.ACTION_SHOW_PERMISSIONS_RATIONALE"/>
+            </intent-filter>
         </activity>
 
         <!-- 🛡️ Emowall Background Guardian Service -->
@@ -55,7 +63,7 @@
             android:name=".EmowallBackgroundService"
             android:enabled="true"
             android:exported="false"
-            android:foregroundServiceType="health"/>
+            android:foregroundServiceType="location"/>
 
         <!-- Auto start after phone reboot -->
         <receiver
@@ -68,9 +76,16 @@
         </receiver>
 
         <!-- Health Connect -->
-        <activity
-            android:name="androidx.health.connect.client.PermissionController"
-            android:exported="true"/>
+        <activity-alias
+            android:name="ViewPermissionUsageActivity"
+            android:exported="true"
+            android:permission="android.permission.START_VIEW_PERMISSION_USAGE"
+            android:targetActivity=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW_PERMISSION_USAGE"/>
+                <category android:name="android.intent.category.HEALTH_PERMISSIONS"/>
+            </intent-filter>
+        </activity-alias>
 
         <meta-data android:name="flutterEmbedding" android:value="2"/>
     </application>

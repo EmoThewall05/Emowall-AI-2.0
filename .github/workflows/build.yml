@@ -2,7 +2,7 @@ name: Emowall AI 2.0 — Build & Release
 
 on:
   push:
-    branches: [main]
+    branches: [main, stage1-play-fixes]
 
 jobs:
   build:
@@ -22,9 +22,6 @@ jobs:
 
       - name: Install dependencies
         run: flutter pub get
-
-      - name: Patch telephony package manifest (AGP namespace fix)
-        run: |
 
       - name: Decode Keystore
         run: |

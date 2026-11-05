@@ -16,7 +16,12 @@ class EmowallBackgroundService : Service() {
     override fun onCreate() {
         super.onCreate()
         createNotificationChannel()
-        startForeground(NOTIFICATION_ID, buildNotification())
+        try {
+            startForeground(NOTIFICATION_ID, buildNotification())
+        } catch (e: Exception) {
+            // Not allowed to run in foreground now (e.g. missing location permission)
+            stopSelf()
+        }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -29,7 +34,7 @@ class EmowallBackgroundService : Service() {
     private fun buildNotification(): Notification {
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("🛡️ Emowall Guardian Active")
-            .setContentText("Protecting you silently...")
+            .setContentText("Emowall protection is on. Location is used for safety alerts.")
             .setSmallIcon(android.R.drawable.ic_lock_silent_mode_off)
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .setSilent(true)
@@ -52,14 +57,6 @@ class EmowallBackgroundService : Service() {
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {
-        // App swipe ചെയ്ത് close ചെയ്താലും restart ചെയ്യും
-        val restartIntent = Intent(applicationContext, EmowallBackgroundService::class.java)
-        val pendingIntent = PendingIntent.getService(
-            applicationContext, 1, restartIntent,
-            PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE
-        )
-        val alarmManager = getSystemService(ALARM_SERVICE) as AlarmManager
-        alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 1000, pendingIntent)
         super.onTaskRemoved(rootIntent)
     }
 }
