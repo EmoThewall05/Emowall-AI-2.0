@@ -1,3 +1,4 @@
+import 'package:emowall/screens/emergency_contacts_screen.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
@@ -593,7 +594,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Widget _buildAddContactButton() {
     return InkWell(
-      onTap: () => _showAddContactSheet(),
+      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const EmergencyContactsScreen())),
       borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 14),

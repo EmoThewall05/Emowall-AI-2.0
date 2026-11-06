@@ -18,6 +18,8 @@ import 'package:emowall/kidnap_mode.dart';
 import 'package:emowall/animal/animal_alert_screen.dart';
 import 'package:emowall/emo_care/emo_care_screen.dart';
 import 'package:emowall/profile/profile_page.dart';
+import 'package:emowall/screens/emergency_contacts_screen.dart';
+import 'package:emowall/services/contacts_api.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -132,7 +134,7 @@ class _ModeSelectionScreenState extends State<ModeSelectionScreen> {
               _permRow('🔔', 'Notifications', 'Silent SOS alerts to parents & guardians'),
               TextButton(
                 onPressed: () => launchUrl(
-                  Uri.parse('https://emobies05.github.io/public-/emowall-privacy-policy.html'),
+                  Uri.parse('https://legal.emothewall.online/privacy'),
                   mode: LaunchMode.externalApplication,
                 ),
                 child: Text('Read our Privacy Policy', style: GoogleFonts.jetBrainsMono(fontSize: 11, color: const Color(0xFF00E676))),
@@ -343,9 +345,53 @@ class _ModeSelectionScreenState extends State<ModeSelectionScreen> {
     );
   }
 
+  /* ===== MODE GATING: 3 EMERGENCY NUMBERS ===== */
+  Future<void> _openMode(BuildContext context, String title, Widget screen) async {
+    const gated = {'Kidnap Mode', 'Shield Mode', 'Care Mode', 'Animal Alert'};
+    if (gated.contains(title)) {
+      int? count;
+      try {
+        final list = await ContactsApi.list().timeout(const Duration(seconds: 5));
+        count = list.length;
+      } catch (_) {
+        count = null; // offline or server error: never lock the user out of safety
+      }
+      if (!context.mounted) return;
+      if (count != null && count < 3) {
+        final go = await showDialog<bool>(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            backgroundColor: const Color(0xFF111519),
+            title: Text('Add 3 emergency numbers',
+                style: GoogleFonts.syne(color: Colors.white)),
+            content: Text(
+                'Safety features need at least 3 emergency numbers so someone can be alerted. '
+                'You have $count. Any 3 numbers you trust are fine.',
+                style: const TextStyle(color: Colors.white70)),
+            actions: [
+              TextButton(
+                  onPressed: () => Navigator.pop(ctx, false),
+                  child: const Text('Later')),
+              ElevatedButton(
+                  onPressed: () => Navigator.pop(ctx, true),
+                  child: const Text('Add numbers')),
+            ],
+          ),
+        );
+        if (!context.mounted) return;
+        if (go == true) {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (_) => const EmergencyContactsScreen()));
+        }
+        return;
+      }
+    }
+    Navigator.push(context, MaterialPageRoute(builder: (_) => screen));
+  }
+
   Widget _modeCard(BuildContext context, String emoji, String title, String subtitle, Color color, Widget screen) {
     return GestureDetector(
-      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => screen)),
+      onTap: () => _openMode(context, title, screen),
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(

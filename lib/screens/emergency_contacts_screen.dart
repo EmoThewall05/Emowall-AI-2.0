@@ -64,7 +64,7 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreen> {
               controller: relationCtrl,
               style: const TextStyle(color: Colors.white),
               decoration: const InputDecoration(
-                  labelText: 'Relation (e.g. Parent, Relative, Principal)'),
+                  labelText: 'Relation (e.g. Parent/Guardian, Relative, Doctor/Hospital)'),
             ),
             TextField(
               controller: phoneCtrl,
@@ -88,6 +88,15 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreen> {
 
     if (result != true || _uid == null) return;
     if (nameCtrl.text.trim().isEmpty || phoneCtrl.text.trim().isEmpty) return;
+    final phoneClean = phoneCtrl.text.trim().replaceAll(RegExp(r'[\s\-()]'), '');
+    if (!RegExp(r'^\+[1-9][0-9]{7,14}$').hasMatch(phoneClean)) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text('Enter the number with country code, e.g. +9715XXXXXXXX')));
+      }
+      return;
+    }
+    phoneCtrl.text = phoneClean;
 
     try {
       if (existing == null) {
@@ -131,7 +140,7 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreen> {
       backgroundColor: const Color(0xFF07080B),
       appBar: AppBar(
         backgroundColor: const Color(0xFF0C0F14),
-        title: Text('ðŸš¨ Emergency Contacts',
+        title: Text('Emergency Contacts (min 3)',
             style: GoogleFonts.syne(fontWeight: FontWeight.w800, color: Colors.white)),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
