@@ -5,7 +5,7 @@ import 'package:camera/camera.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:io';
-import '../services/alert_service.dart';
+import '../services/verification_chain_service.dart';
 
 class AnimalAlertScreen extends StatefulWidget {
   const AnimalAlertScreen({super.key});
@@ -93,18 +93,25 @@ class _AnimalAlertScreenState extends State<AnimalAlertScreen> {
   Future<void> _triggerAttackAlert() async {
     HapticFeedback.heavyImpact();
     await SystemSound.play(SystemSoundType.alert);
+    if (!mounted) return;
 
-    final alertService = AlertService();
-    final species = _scanResult?['species'] ?? 'unknown animal';
-    final firstAid = _scanResult?['firstAid'] ?? 'Seek immediate medical help.';
-    final urgent = _scanResult?['hospitalUrgency'] ?? 'immediate';
+    final raw = (_scanResult?['species'] ?? '').toString();
+    final species = raw
+        .replaceAll(RegExp(r'[^\x20-\x7E]'), '')
+        .replaceAll(RegExp(r'\s+'), ' ')
+        .trim();
+    final short =
+        species.length > 24 ? species.substring(0, 24).trim() : species;
+    final reason = short.isEmpty
+        ? 'Animal attack - needs medical care'
+        : 'Animal attack - possible $short. Needs medical care';
 
-    await alertService.sendEmergencyAlert(
-      childName: 'User',
-      reason: 'Animal Attack — $species. First Aid: $firstAid. Hospital urgency: $urgent.',
-      location: 'Live GPS Active',
-      country: 'India',
-      isFree: true,
+    setState(() => _status = 'Sending alert to your emergency contacts...');
+    await VerificationChainService().startChain(
+      reason: reason,
+      onStatusUpdate: (status) {
+        if (mounted) setState(() => _status = status.message);
+      },
     );
   }
 
@@ -290,7 +297,7 @@ class _AnimalAlertScreenState extends State<AnimalAlertScreen> {
 
                 const Divider(color: Color(0xFF1E2A35), height: 24),
 
-                Text('🩹 First Aid',
+                Text('🩹 First Aid - AI guidance, not medical advice',
                     style: GoogleFonts.syne(
                       fontWeight: FontWeight.w700,
                       color: const Color(0xFF00d4aa),
@@ -332,7 +339,7 @@ class _AnimalAlertScreenState extends State<AnimalAlertScreen> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          'ANTIVENOM REQUIRED — Rush to hospital immediately!',
+                          'AI suggests possible venom. Cannot confirm. Seek medical care immediately.',
                           style: GoogleFonts.jetBrainsMono(
                             fontSize: 11,
                             color: const Color(0xFFEF4444),
@@ -372,7 +379,7 @@ class _AnimalAlertScreenState extends State<AnimalAlertScreen> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Triggers loud alert + contacts + emergency services',
+                    'Sends an SMS alert to your emergency contacts. Also call your local emergency number.',
                     textAlign: TextAlign.center,
                     style: GoogleFonts.jetBrainsMono(
                       fontSize: 10,
