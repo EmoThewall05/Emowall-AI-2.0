@@ -17,14 +17,15 @@ class HealthConsentDialog extends StatelessWidget {
       content: Text(
         'Emowall is not a medical device and does not diagnose any '
         'health condition.\n\n'
-        'With your permission, it can read heart rate and blood oxygen '
-        'data via Health Connect from your phone or smartwatch. This is '
+        'With your permission, it can read heart rate data via Health '
+        'Connect from your phone or smartwatch. This is '
         'used only as one additional signal — alongside sound and '
         'location — to detect possible physical distress during Kidnap '
         'Mode (for example, a sustained abnormal heart rate).\n\n'
-        'This data stays on your device and is never uploaded to our '
-        'servers, except as part of an emergency alert you or the app '
-        'has triggered.',
+        'Readings are checked on your device. If an emergency alert is '
+        'triggered, the alert reason (including the heart-rate reading) '
+        'may be sent to our server and to your emergency contacts. See '
+        'our Privacy Policy.',
         style: GoogleFonts.jetBrainsMono(
             fontSize: 12, color: Colors.white70, height: 1.5),
       ),

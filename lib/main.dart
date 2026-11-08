@@ -128,7 +128,7 @@ class _ModeSelectionScreenState extends State<ModeSelectionScreen> {
               const SizedBox(height: 16),
               _permRow('📍', 'Location', 'Detect unsafe zones & send live location during SOS. Location is used only while the app is open.'),
               _permRow('🎤', 'Microphone', 'Danger words are recognised by the Android speech service. We never record or store audio'),
-              _permRow('📷', 'Camera', 'Animal Alert and Media Check: photos you choose are sent to AI services (Anthropic, Google) for analysis'),
+              _permRow('📷', 'Camera', 'Animal Alert and Media Check: photos you choose are sent to AI services (Google, Cloudflare) for analysis'),
               _permRow('⌚', 'Health Connect', 'Heart rate, only with your consent, to detect possible distress. Falls use the phone motion sensor'),
               _permRow('📞', 'SMS Alerts', 'Our server (via Twilio) sends emergency SMS to the contacts you add. They receive your name, location and the alert reason'),
               _permRow('🔔', 'Notifications', 'Silent SOS alerts to parents & guardians'),

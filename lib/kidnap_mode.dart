@@ -27,7 +27,6 @@ final HealthWatchService _healthService = HealthWatchService();
   bool _isActive = false;
   bool _soundDetectOn = false;
   bool _isEmergency = false;
-  bool _chainActive = false;
   String _status = '🛡️ Kidnap Mode Ready';
   String _chainStatus = '';
   int _sosCountdown = 10;
@@ -66,7 +65,7 @@ final HealthWatchService _healthService = HealthWatchService();
   Future<void> _activateProtection() async {
     setState(() {
       _isActive = true;
-      _status = '🟢 PROTECTION ACTIVE — Monitoring silently...';
+      _status = '🟢 PROTECTION ACTIVE — Listening while the app is open...';
     });
 
     // Start sound detection
@@ -122,8 +121,7 @@ final HealthWatchService _healthService = HealthWatchService();
 
   // 🔕 Silent SOS — attacker never knows
   Future<void> _triggerSilentSOS(String reason) async {
-    if (_chainActive) return;
-    _chainActive = true;
+    if (_chainService.isActive) return;
 
     // Silent — no vibration, no sound, no screen
     await _chainService.startChain(
@@ -159,7 +157,6 @@ final HealthWatchService _healthService = HealthWatchService();
   Future<void> _triggerFullSOS(String reason) async {
     setState(() {
       _isEmergency = false;
-      _chainActive = true;
       _status = '🚨 SOS TRIGGERED — Verification chain started!';
     });
 
@@ -184,7 +181,7 @@ final HealthWatchService _healthService = HealthWatchService();
     setState(() {
       _isEmergency = false;
       _sosCountdown = 10;
-      _status = '🟢 PROTECTION ACTIVE — Monitoring silently...';
+      _status = '🟢 PROTECTION ACTIVE — Listening while the app is open...';
     });
   }
 
@@ -270,6 +267,42 @@ final HealthWatchService _healthService = HealthWatchService();
                       fontSize: 11, color: const Color(0xFFFF5500))),
             ),
 
+          /* ===== WATCH INFO ===== */
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(14),
+            margin: const EdgeInsets.only(bottom: 16),
+            decoration: BoxDecoration(
+              color: const Color(0xFF111519),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                  color: const Color(0xFF3B82F6).withOpacity(0.4)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('⌚ Smartwatch needed for full protection',
+                    style: GoogleFonts.syne(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 13,
+                        color: Colors.white)),
+                const SizedBox(height: 6),
+                Text(
+                    'Kidnap Mode gives full protection only with a smartwatch '
+                    'that has: heart-rate sensor, blood-pressure sensor, motion '
+                    'sensor (hit/fall detection), microphone, GPS, and internet '
+                    '(SIM or Wi-Fi). With a watch that lacks any of these, some '
+                    'protection features will not work.\n'
+                    'Emowall is not a medical device.',
+                    style: GoogleFonts.jetBrainsMono(
+                        fontSize: 10,
+                        height: 1.5,
+                        color: const Color(0xFF8892A4))),
+              ],
+            ),
+          ),
+          /* ===== END WATCH INFO ===== */
+
           // Status
           Container(
             width: double.infinity,
@@ -334,7 +367,7 @@ final HealthWatchService _healthService = HealthWatchService();
                     style: GoogleFonts.jetBrainsMono(
                         fontSize: 10, color: const Color(0xFF8892A4))),
                 if (_isActive)
-                  Text('● LIVE — Monitoring silently',
+                  Text('● LIVE — Keep the app open',
                       style: GoogleFonts.jetBrainsMono(
                           fontSize: 10, color: const Color(0xFF00E676))),
               ])),
@@ -364,7 +397,7 @@ final HealthWatchService _healthService = HealthWatchService();
                 Text('👂 Sound Detection',
                     style: GoogleFonts.syne(
                         fontWeight: FontWeight.w700, color: Colors.white)),
-                Text('Detecting threats silently 24/7',
+                Text('Listens for danger words while the app is open',
                     style: GoogleFonts.jetBrainsMono(
                         fontSize: 10, color: const Color(0xFF8892A4))),
               ])),

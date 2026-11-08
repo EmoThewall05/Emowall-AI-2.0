@@ -15,7 +15,6 @@ class HealthWatchService {
 
   static const _types = [
     HealthDataType.HEART_RATE,
-    HealthDataType.BLOOD_OXYGEN,
   ];
 
   /// Must be called after the user has explicitly agreed to the
