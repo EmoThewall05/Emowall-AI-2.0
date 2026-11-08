@@ -5,9 +5,9 @@ import 'dart:async';
 import '../services/sound_detection_service.dart';
 import '../services/verification_chain_service.dart';
 import '../services/location_service.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'screens/emergency_contacts_screen.dart';
+import 'watch/watch_screen.dart';
 import '../services/health_watch_service.dart';
 import '../widgets/health_consent_dialog.dart';
 import 'package:emowall/services/contacts_api.dart';
@@ -442,6 +442,24 @@ final HealthWatchService _healthService = HealthWatchService();
                   minimumSize: const Size(double.infinity, 44),
                 ),
               ),
+              /* ===== WATCH BUTTON ===== */
+              const SizedBox(height: 10),
+              ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const WatchScreen()),
+                  );
+                },
+                icon: const Icon(Icons.watch),
+                label: const Text("Child's Watch"),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF111519),
+                  foregroundColor: Colors.white,
+                  minimumSize: const Size(double.infinity, 44),
+                ),
+              ),
+              /* ===== END WATCH BUTTON ===== */
             ]),
           ),
         ]),

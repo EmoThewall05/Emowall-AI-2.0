@@ -158,7 +158,7 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreen> {
               : _contacts.isEmpty
                   ? const Center(
                       child: Text(
-                          'No emergency contacts yet.\nTap + to add parent, relative or school principal.',
+                          'No emergency contacts yet.\nTap + to add contacts. Add the PARENT first (the first contact gets the first alert), then relatives, then police or other official numbers.',
                           textAlign: TextAlign.center,
                           style: TextStyle(color: Colors.white70)))
                   : ListView.builder(
