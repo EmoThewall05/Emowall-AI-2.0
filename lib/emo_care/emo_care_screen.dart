@@ -7,10 +7,30 @@ class EmoCareScreen extends StatefulWidget {
   EmoCareScreenState createState() => EmoCareScreenState();
 }
 
-class EmoCareScreenState extends State<EmoCareScreen> {
+class EmoCareScreenState extends State<EmoCareScreen>
+    with SingleTickerProviderStateMixin {
   List<Map<String, dynamic>> messages = [];
   TextEditingController controller = TextEditingController();
   ScrollController scrollController = ScrollController();
+
+  // ===== TYPING INDICATOR STATE =====
+  bool _isTyping = false;
+  late AnimationController _wingController;
+
+  @override
+  void initState() {
+    super.initState();
+    _wingController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 700),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _wingController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -117,8 +137,11 @@ class EmoCareScreenState extends State<EmoCareScreen> {
                 : ListView.builder(
                     controller: scrollController,
                     padding: EdgeInsets.all(15),
-                    itemCount: messages.length,
+                    itemCount: messages.length + (_isTyping ? 1 : 0),
                     itemBuilder: (context, index) {
+                      if (index == messages.length) {
+                        return _buildTypingBubble();
+                      }
                       return _buildMessageBubble(messages[index]);
                     },
                   ),
@@ -257,6 +280,41 @@ class EmoCareScreenState extends State<EmoCareScreen> {
     );
   }
 
+  // ===== TYPING INDICATOR =====
+  Widget _buildTypingBubble() {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: AnimatedBuilder(
+        animation: _wingController,
+        builder: (context, child) {
+          final t = _wingController.value; // 0 = wings closed, 1 = open
+          return Container(
+            margin: EdgeInsets.only(bottom: 10),
+            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            decoration: BoxDecoration(
+              color: Color(0xFF141b22),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: Color(0xFF00d4aa).withOpacity(0.15 + 0.25 * t),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Color(0xFF00d4aa).withOpacity(0.10 + 0.20 * t),
+                  blurRadius: 8 + 12 * t,
+                ),
+              ],
+            ),
+            child: Transform(
+              alignment: Alignment.center,
+              transform: Matrix4.diagonal3Values(0.35 + 0.65 * t, 0.9 + 0.1 * t, 1.0),
+              child: Text('🦋', style: TextStyle(fontSize: 26)),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
   Future<void> _sendMessage() async {
     String text = controller.text.trim();
     if (text.isEmpty) return;
@@ -274,11 +332,27 @@ class EmoCareScreenState extends State<EmoCareScreen> {
     
     _scrollToBottom();
     
+    // ===== TYPING INDICATOR ON =====
+    setState(() {
+      _isTyping = true;
+    });
+    _scrollToBottom();
+
     // Detect emotion
     String emotion = EmotionDetector.detect(text);
     
     // Get AI response
-    String response = await EmoCare.getResponse(text, emotion);
+    String response;
+    try {
+      response = await EmoCare.getResponse(text, emotion);
+    } finally {
+      // ===== TYPING INDICATOR OFF =====
+      if (mounted) {
+        setState(() {
+          _isTyping = false;
+        });
+      }
+    }
     
     // Add AI message
     setState(() {
