@@ -23,8 +23,10 @@ class _MediaVerifierScreenState extends State<MediaVerifierScreen>
   late AnimationController _pulseController;
   late Animation<double> _pulseAnimation;
 
-  // ✅ Replace with your actual Gemini API Key
-  static const String _geminiApiKey = String.fromEnvironment('GEMINI_API_KEY');
+  /* ===== MEDIA CHECK WORKER ===== */
+  static const String _workerUrl =
+      'https://emowall-media-check.meradivin.workers.dev';
+  static const String _emoKey = 'emo_75bb11d8d603c836f5768adb';
 
   @override
   void initState() {
@@ -110,89 +112,27 @@ class _MediaVerifierScreenState extends State<MediaVerifierScreen>
 
       final response = await http
           .post(
-            Uri.parse(
-              'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=$_geminiApiKey',
-            ),
-            headers: {'Content-Type': 'application/json'},
+            Uri.parse(_workerUrl),
+            headers: {
+              'Content-Type': 'application/json',
+              'X-Emo-Key': _emoKey,
+            },
             body: jsonEncode({
-              'contents': [
-                {
-                  'parts': [
-                    {
-                      'inline_data': {
-                        'mime_type': mimeType,
-                        'data': base64Data,
-                      }
-                    },
-                    {
-                      'text': '''
-You are an expert AI media forensics analyst.
-
-Carefully analyze this ${_isImage ? 'image' : 'video'} and determine EXACTLY which ONE of these categories it belongs to:
-
-1. REAL — Authentic, original, unedited content captured by a camera
-2. EDITED — Real content that has been modified (Photoshop, filters, color grading, cropping, compositing, face swap on real image, object removal, etc.)
-3. AI_GENERATED — Entirely or mostly created by AI tools (Midjourney, DALL-E, Stable Diffusion, Sora, DeepFake video, GAN-generated faces, etc.)
-
-Look for these forensic clues:
-- Unnatural lighting, shadows, or reflections
-- Blurry or distorted edges, especially around faces or hair
-- Inconsistent textures or patterns
-- Metadata anomalies (if available)
-- AI artifacts: overly smooth skin, strange backgrounds, impossible details
-- Deepfake indicators: unnatural eye movement, blinking, lip sync issues (for video)
-- Compression artifacts inconsistent with stated source
-
-Respond ONLY in this exact JSON format, nothing else:
-{
-  "verdict": "REAL" or "EDITED" or "AI_GENERATED",
-  "confidence": <integer 0-100>,
-  "reason": "<one clear sentence summary of your finding>",
-  "details": [
-    "<specific forensic observation 1>",
-    "<specific forensic observation 2>",
-    "<specific forensic observation 3>"
-  ]
-}
-'''
-                    }
-                  ]
-                }
-              ],
-              'generationConfig': {
-                'temperature': 0.1,
-                'maxOutputTokens': 500,
-              }
+              'mediaBase64': base64Data,
+              'mimeType': mimeType,
             }),
           )
           .timeout(const Duration(seconds: 45));
 
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        final text =
-            data['candidates'][0]['content']['parts'][0]['text'] as String;
-
-        // Clean JSON from response
-        String jsonStr = text
-            .replaceAll('```json', '')
-            .replaceAll('```', '')
-            .trim();
-
-        // Extract JSON object if extra text
-        final startIndex = jsonStr.indexOf('{');
-        final endIndex = jsonStr.lastIndexOf('}');
-        if (startIndex != -1 && endIndex != -1) {
-          jsonStr = jsonStr.substring(startIndex, endIndex + 1);
-        }
-
-        final parsed = jsonDecode(jsonStr) as Map<String, dynamic>;
+        final parsed = jsonDecode(response.body) as Map<String, dynamic>;
         setState(() => _result = parsed);
       } else {
         setState(() => _result = {
               'verdict': 'ERROR',
               'confidence': 0,
               'reason':
-                  'API error ${response.statusCode}. Please check your API key.',
+                  'Analysis failed (error ${response.statusCode}). Please try again.',
               'details': [],
             });
       }
@@ -400,7 +340,7 @@ Respond ONLY in this exact JSON format, nothing else:
                       ),
                     ),
                     Text(
-                      'Powered by Gemini Vision AI',
+                      'Powered by AI vision',
                       style: GoogleFonts.spaceGrotesk(
                         color: const Color(0xFF7C3AED),
                         fontSize: 12,
@@ -621,7 +561,7 @@ Respond ONLY in this exact JSON format, nothing else:
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'Analyzing with Gemini AI...',
+                  'Analyzing with AI...',
                   style: GoogleFonts.syne(
                     color: const Color(0xFF7C3AED),
                     fontSize: 15,
