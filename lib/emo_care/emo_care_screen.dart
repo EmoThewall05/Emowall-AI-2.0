@@ -88,7 +88,7 @@ class EmoCareScreenState extends State<EmoCareScreen>
                 SizedBox(width: 10),
                 Expanded(
                   child: Text(
-                    'You are safe here. Whatever you share stays between us. 🦋',
+                    'You are safe here. Your messages are sent to an AI service to reply. 🦋',
                     style: TextStyle(
                       color: Colors.white70,
                       fontSize: 12,
